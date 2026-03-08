@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001";
+const API_BASE =
+  import.meta.env.VITE_API_BASE || "https://schoolsdataproject-backend.onrender.com";
 const INITIAL_FILTERS = {
   districtId: "",
   blockId: "",

@@ -19,7 +19,7 @@ Runs at Vite's local URL (usually `http://localhost:5173`).
 
 ## Backend API URL
 
-By default it uses `http://localhost:3001`.
+By default it uses `https://schoolsdataproject-backend.onrender.com`.
 
 To override:
 
