@@ -234,17 +234,17 @@ export default function App() {
           <tbody>
             {rows.map((row) => (
               <tr key={`${row.schoolId || ""}-${row.udiseschCode || ""}`}>
-                <td>{row.udiseschCode || "-"}</td>
-                <td>{row.schoolName || "-"}</td>
-                <td>{row.districtName || row.districtId || "-"}</td>
-                <td>{row.blockName || row.blockId || "-"}</td>
-                <td>{row.villageName || row.villageId || "-"}</td>
-                <td>{row.schCatDesc || row.schCategoryId || "-"}</td>
-                <td>{row.schTypeDesc || row.schType || "-"}</td>
-                <td>{row.schMgmtDesc || row.schMgmtId || "-"}</td>
-                <td>{row.schoolStatusName || row.schoolStatus || "-"}</td>
-                <td>{row.classFrm || "-"}</td>
-                <td>{row.classTo || "-"}</td>
+                <td data-label="UDISE Code">{row.udiseschCode || "-"}</td>
+                <td data-label="School Name">{row.schoolName || "-"}</td>
+                <td data-label="District">{row.districtName || row.districtId || "-"}</td>
+                <td data-label="Block">{row.blockName || row.blockId || "-"}</td>
+                <td data-label="Village">{row.villageName || row.villageId || "-"}</td>
+                <td data-label="Category">{row.schCatDesc || row.schCategoryId || "-"}</td>
+                <td data-label="Type">{row.schTypeDesc || row.schType || "-"}</td>
+                <td data-label="Management">{row.schMgmtDesc || row.schMgmtId || "-"}</td>
+                <td data-label="Status">{row.schoolStatusName || row.schoolStatus || "-"}</td>
+                <td data-label="Class From">{row.classFrm || "-"}</td>
+                <td data-label="Class To">{row.classTo || "-"}</td>
               </tr>
             ))}
             {rows.length === 0 && !loading && (

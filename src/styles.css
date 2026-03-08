@@ -34,6 +34,7 @@ label {
   flex-direction: column;
   gap: 6px;
   font-size: 13px;
+  min-width: 0;
 }
 
 input,
@@ -45,6 +46,13 @@ button {
   background: #fff;
 }
 
+input,
+select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
 .wide {
   grid-column: span 2;
 }
@@ -53,6 +61,10 @@ button {
   display: flex;
   align-items: end;
   gap: 8px;
+}
+
+.actions button {
+  min-height: 40px;
 }
 
 .meta {
@@ -90,4 +102,104 @@ th {
   justify-content: center;
   gap: 10px;
   margin-top: 14px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 12px;
+  }
+
+  .filters {
+    grid-template-columns: 1fr;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  label {
+    font-size: 12px;
+  }
+
+  .wide {
+    grid-column: auto;
+  }
+
+  input,
+  select,
+  button {
+    font-size: 13px;
+    padding: 7px 8px;
+  }
+
+  select {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+
+  .tableWrap {
+    overflow: visible;
+    background: transparent;
+    border: 0;
+  }
+
+  table,
+  thead,
+  tbody,
+  tr,
+  th,
+  td {
+    display: block;
+    width: 100%;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tbody {
+    display: grid;
+    gap: 10px;
+  }
+
+  tbody tr {
+    background: #fff;
+    border: 1px solid #dbe2ea;
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+
+  td {
+    border-bottom: 1px solid #eef2f7;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    padding: 8px 0;
+  }
+
+  td:last-child {
+    border-bottom: 0;
+  }
+
+  td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 2px;
+  }
+
+  .pagination {
+    justify-content: space-between;
+    gap: 8px;
+  }
 }
