@@ -1,11 +1,11 @@
 import { SchoolCard } from "./SchoolCard";
+import { SkeletonCard } from "./SkeletonCard";
 
 export function SchoolCardGrid({ rows, loading, onEdit }) {
   if (loading) {
     return (
-      <div className="card-grid-state">
-        <div className="spinner" aria-label="Loading" />
-        <p>Loading schools…</p>
+      <div className="card-grid">
+        <SkeletonCard count={6} />
       </div>
     );
   }
@@ -14,6 +14,7 @@ export function SchoolCardGrid({ rows, loading, onEdit }) {
     return (
       <div className="card-grid-state">
         <p className="no-results">No schools found matching your filters.</p>
+        <p className="no-results-hint">Try adjusting your filters or search terms.</p>
       </div>
     );
   }
@@ -21,7 +22,11 @@ export function SchoolCardGrid({ rows, loading, onEdit }) {
   return (
     <div className="card-grid">
       {rows.map((school, index) => (
-        <SchoolCard key={school.sourceKey ?? school.udiseschCode ?? school.schoolId ?? index} school={school} onEdit={onEdit} />
+        <SchoolCard
+          key={school.sourceKey ?? school.udiseschCode ?? school.schoolId ?? index}
+          school={school}
+          onEdit={onEdit}
+        />
       ))}
     </div>
   );

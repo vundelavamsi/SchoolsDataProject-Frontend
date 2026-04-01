@@ -81,9 +81,8 @@ export function FilterPanel({ filters, options, onFilterChange, onApply, onReset
           <label className="filter-label" htmlFor="classFromMin">Class From</label>
           <input
             id="classFromMin"
-            type="number"
-            min="1"
-            max="12"
+            type="text"
+            inputMode="numeric"
             className="filter-input"
             value={filters.classFromMin}
             onChange={(e) => onFilterChange("classFromMin", e.target.value)}
@@ -94,9 +93,8 @@ export function FilterPanel({ filters, options, onFilterChange, onApply, onReset
           <label className="filter-label" htmlFor="classToMax">Class To</label>
           <input
             id="classToMax"
-            type="number"
-            min="1"
-            max="12"
+            type="text"
+            inputMode="numeric"
             className="filter-input"
             value={filters.classToMax}
             onChange={(e) => onFilterChange("classToMax", e.target.value)}
@@ -107,7 +105,8 @@ export function FilterPanel({ filters, options, onFilterChange, onApply, onReset
           <label className="filter-label" htmlFor="search">Search</label>
           <input
             id="search"
-            type="text"
+            type="search"
+            inputMode="search"
             className="filter-input"
             value={filters.search}
             onChange={(e) => onFilterChange("search", e.target.value)}

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { displayValue, maskUdise } from "../lib/utils";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001";
 const TABS = ["all", "pending", "approved", "rejected"];
@@ -15,12 +16,138 @@ function StatusBadge({ status }) {
   return <span className={cls}>{status}</span>;
 }
 
+function EditCardView({ rows, inFlight, rowErrors, onAction }) {
+  return (
+    <div className="edit-cards">
+      {rows.map((row) => (
+        <div key={row.id} className="edit-card">
+          <div className="edit-card-header">
+            <span className="edit-card-school">{displayValue(row.schoolName)}</span>
+            <StatusBadge status={row.status} />
+          </div>
+          <div className="edit-card-body">
+            <div className="edit-card-meta">
+              <span>UDISE: <strong>{maskUdise(row.udiseschCode)}</strong></span>
+              <span>By: <strong>{displayValue(row.submittedBy)}</strong></span>
+              <span>{row.submittedAt ? new Date(row.submittedAt).toLocaleDateString() : "—"}</span>
+            </div>
+            <div className="edit-card-change">
+              <span className="edit-card-old">{displayValue(row.oldValue)}</span>
+              <span className="edit-card-arrow">&rarr;</span>
+              <span className="edit-card-new">{displayValue(row.newValue)}</span>
+            </div>
+            {row.reviewedAt && (
+              <div className="review-time">
+                Reviewed: {new Date(row.reviewedAt).toLocaleString()}
+              </div>
+            )}
+            {rowErrors[row.id] && (
+              <div className="row-error">{rowErrors[row.id]}</div>
+            )}
+          </div>
+          {row.status === "pending" && (
+            <div className="edit-card-actions">
+              <button
+                className="btn btn--success btn--sm"
+                onClick={() => onAction(row.id, "approve")}
+                disabled={!!inFlight[row.id]}
+                type="button"
+              >
+                Approve
+              </button>
+              <button
+                className="btn btn--danger btn--sm"
+                onClick={() => onAction(row.id, "reject")}
+                disabled={!!inFlight[row.id]}
+                type="button"
+              >
+                Reject
+              </button>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function EditTableView({ rows, inFlight, rowErrors, onAction }) {
+  return (
+    <div className="edits-table-wrapper">
+      <table className="edits-table">
+        <thead>
+          <tr>
+            <th>School Name</th>
+            <th>UDISE</th>
+            <th>Old Village</th>
+            <th>New Village</th>
+            <th>Submitted By</th>
+            <th>Submitted At</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id}>
+              <td>{displayValue(row.schoolName)}</td>
+              <td className="td-muted">{maskUdise(row.udiseschCode)}</td>
+              <td>{displayValue(row.oldValue)}</td>
+              <td><strong>{displayValue(row.newValue)}</strong></td>
+              <td>{displayValue(row.submittedBy)}</td>
+              <td className="td-muted">
+                {row.submittedAt ? new Date(row.submittedAt).toLocaleString() : "—"}
+              </td>
+              <td>
+                <StatusBadge status={row.status} />
+                {row.reviewedAt && (
+                  <div className="review-time">
+                    {new Date(row.reviewedAt).toLocaleString()}
+                  </div>
+                )}
+              </td>
+              <td>
+                {row.status === "pending" ? (
+                  <div>
+                    <div className="td-actions">
+                      <button
+                        className="btn btn--success btn--sm"
+                        onClick={() => onAction(row.id, "approve")}
+                        disabled={!!inFlight[row.id]}
+                        type="button"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        className="btn btn--danger btn--sm"
+                        onClick={() => onAction(row.id, "reject")}
+                        disabled={!!inFlight[row.id]}
+                        type="button"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                    {rowErrors[row.id] && (
+                      <div className="row-error">{rowErrors[row.id]}</div>
+                    )}
+                  </div>
+                ) : null}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export function ReviewEditsPage({ onBack }) {
   const [activeTab, setActiveTab] = useState("all");
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [rowErrors, setRowErrors] = useState({}); // id → error string
-  const [inFlight, setInFlight] = useState({}); // id → true while request pending
+  const [rowErrors, setRowErrors] = useState({});
+  const [inFlight, setInFlight] = useState({});
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   const fetchEdits = useCallback(async (tab) => {
     setLoading(true);
@@ -62,104 +189,59 @@ export function ReviewEditsPage({ onBack }) {
   };
 
   return (
-    <div className="page-layout" style={{ maxWidth: 1200 }}>
-      <button className="page-back" onClick={onBack} type="button">
-        ← Back to search
-      </button>
-
-      <h1 className="page-title">Edit Requests</h1>
-
-      <div className="tab-bar">
-        {TABS.map((tab) => (
-          <button
-            key={tab}
-            className={`tab-btn${activeTab === tab ? " tab-btn--active" : ""}`}
-            onClick={() => setActiveTab(tab)}
-            type="button"
-          >
-            {TAB_LABELS[tab]}
+    <div className="app-layout">
+      <header className="app-header">
+        <div className="header-left">
+          <h1 className="app-title">Edit Requests</h1>
+        </div>
+        <nav className="header-nav">
+          <button className="btn btn--outline btn--sm" onClick={onBack} type="button">
+            Back
           </button>
-        ))}
-      </div>
+        </nav>
+      </header>
 
-      {loading ? (
-        <div className="card-grid-state">
-          <div className="spinner" aria-label="Loading" />
-          <p>Loading…</p>
+      <div className="app-main">
+        <div className="page-layout review-layout">
+          <div className="tab-bar">
+            {TABS.map((tab) => (
+              <button
+                key={tab}
+                className={`tab-btn${activeTab === tab ? " tab-btn--active" : ""}`}
+                onClick={() => setActiveTab(tab)}
+                type="button"
+              >
+                {TAB_LABELS[tab]}
+              </button>
+            ))}
+          </div>
+
+          {loading ? (
+            <div className="card-grid-state">
+              <div className="spinner" aria-label="Loading" />
+              <p>Loading...</p>
+            </div>
+          ) : rows.length === 0 ? (
+            <div className="card-grid-state">
+              <p className="no-results">No edit requests found.</p>
+            </div>
+          ) : isMobile ? (
+            <EditCardView
+              rows={rows}
+              inFlight={inFlight}
+              rowErrors={rowErrors}
+              onAction={handleAction}
+            />
+          ) : (
+            <EditTableView
+              rows={rows}
+              inFlight={inFlight}
+              rowErrors={rowErrors}
+              onAction={handleAction}
+            />
+          )}
         </div>
-      ) : rows.length === 0 ? (
-        <div className="card-grid-state">
-          <p className="no-results">No edit requests found.</p>
-        </div>
-      ) : (
-        <div className="page-card" style={{ padding: 0, overflow: "hidden" }}>
-          <table className="edits-table">
-            <thead>
-              <tr>
-                <th>School Name</th>
-                <th>UDISE</th>
-                <th>Old Village</th>
-                <th>New Village</th>
-                <th>Submitted By</th>
-                <th>Submitted At</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.id}>
-                  <td>{displayValue(row.schoolName)}</td>
-                  <td>{maskUdise(row.udiseschCode)}</td>
-                  <td>{displayValue(row.oldValue)}</td>
-                  <td><strong>{displayValue(row.newValue)}</strong></td>
-                  <td>{displayValue(row.submittedBy)}</td>
-                  <td style={{ whiteSpace: "nowrap", fontSize: 12, color: "var(--color-text-muted)" }}>
-                    {row.submittedAt ? new Date(row.submittedAt).toLocaleString() : "—"}
-                  </td>
-                  <td>
-                    <StatusBadge status={row.status} />
-                    {row.reviewedAt && (
-                      <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 2 }}>
-                        {new Date(row.reviewedAt).toLocaleString()}
-                      </div>
-                    )}
-                  </td>
-                  <td>
-                    {row.status === "pending" && (
-                      <div style={{ display: "flex", gap: 6, flexDirection: "column" }}>
-                        <div style={{ display: "flex", gap: 6 }}>
-                          <button
-                            className="btn btn--sm"
-                            style={{ background: "var(--color-success)", color: "#fff", border: "none" }}
-                            onClick={() => handleAction(row.id, "approve")}
-                            disabled={!!inFlight[row.id]}
-                            type="button"
-                          >
-                            Approve
-                          </button>
-                          <button
-                            className="btn btn--sm"
-                            style={{ background: "var(--color-danger)", color: "#fff", border: "none" }}
-                            onClick={() => handleAction(row.id, "reject")}
-                            disabled={!!inFlight[row.id]}
-                            type="button"
-                          >
-                            Reject
-                          </button>
-                        </div>
-                        {rowErrors[row.id] && (
-                          <div className="row-error">{rowErrors[row.id]}</div>
-                        )}
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { memo, useState } from "react";
 import { maskUdise, formatClassRange, displayValue } from "../lib/utils";
 
 function StatusBadge({ status, statusName }) {
@@ -10,24 +11,23 @@ function StatusBadge({ status, statusName }) {
   return <span className={cls}>{name}</span>;
 }
 
-export function SchoolCard({ school, onEdit }) {
+const ChevronDown = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+
+export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
+  const [detailsExpanded, setDetailsExpanded] = useState(false);
+
   return (
     <div className="school-card">
       <div className="card-header">
         <div className="card-header-top">
           <span className="card-udise">
-            UDISE Code: <strong>{maskUdise(school.udiseschCode)}</strong>
+            UDISE: <strong>{maskUdise(school.udiseschCode)}</strong>
           </span>
           <StatusBadge status={school.schoolStatus} statusName={school.schoolStatusName} />
-          {onEdit && (
-            <button
-              className="btn btn--outline btn--sm"
-              onClick={() => onEdit(school)}
-              type="button"
-            >
-              Edit
-            </button>
-          )}
         </div>
         <div className="card-title">{displayValue(school.schoolName, "—")}</div>
         <div className="card-geo">
@@ -39,13 +39,13 @@ export function SchoolCard({ school, onEdit }) {
       </div>
 
       <div className="card-body">
-        <div className="card-col">
+        <div className="card-body-primary">
           <div className="field-row">
             <span className="field-label">School Category</span>
             <span className="field-value">{displayValue(school.schCatDesc)}</span>
           </div>
           <div className="field-row">
-            <span className="field-label">Class</span>
+            <span className="field-label">Class Range</span>
             <span className="field-value">{formatClassRange(school.classFrm, school.classTo)}</span>
           </div>
           <div className="field-row">
@@ -53,20 +53,20 @@ export function SchoolCard({ school, onEdit }) {
             <span className="field-value">{displayValue(school.schLocDesc)}</span>
           </div>
           <div className="field-row">
-            <span className="field-label">LGD Panchayat</span>
-            <span className="field-value">{displayValue(school.lgdvillpanchayatName)}</span>
-          </div>
-        </div>
-
-        <div className="card-col">
-          <div className="field-row">
-            <span className="field-label">School Management</span>
+            <span className="field-label">Management</span>
             <span className="field-value">{displayValue(school.schMgmtDesc)}</span>
           </div>
           <div className="field-row">
             <span className="field-label">School Type</span>
             <span className="field-value">{displayValue(school.schTypeDesc)}</span>
           </div>
+          <div className="field-row">
+            <span className="field-label">LGD Panchayat</span>
+            <span className="field-value">{displayValue(school.lgdvillpanchayatName)}</span>
+          </div>
+        </div>
+
+        <div className={`card-body-secondary${detailsExpanded ? " expanded" : ""}`}>
           <div className="field-row">
             <span className="field-label">LGD Block</span>
             <span className="field-value">{displayValue(school.lgdblockName)}</span>
@@ -75,9 +75,6 @@ export function SchoolCard({ school, onEdit }) {
             <span className="field-label">LGD Village</span>
             <span className="field-value">{displayValue(school.lgdvillName)}</span>
           </div>
-        </div>
-
-        <div className="card-col card-col--address">
           <div className="field-row">
             <span className="field-label">Address</span>
             <span className="field-value">{displayValue(school.address)}</span>
@@ -93,13 +90,34 @@ export function SchoolCard({ school, onEdit }) {
             </div>
           )}
           {school.lastmodifiedTime && (
-            <div className="field-row field-row--modified">
+            <div className="field-row">
               <span className="field-label">Last Modified</span>
               <span className="field-value field-value--muted">{school.lastmodifiedTime}</span>
             </div>
           )}
         </div>
+
+        <button
+          className={`card-details-toggle${detailsExpanded ? " expanded" : ""}`}
+          onClick={() => setDetailsExpanded((v) => !v)}
+          type="button"
+        >
+          {detailsExpanded ? "Less details" : "More details"}
+          <ChevronDown />
+        </button>
       </div>
+
+      {onEdit && (
+        <div className="card-footer">
+          <button
+            className="btn btn--outline btn--sm"
+            onClick={() => onEdit(school)}
+            type="button"
+          >
+            Edit
+          </button>
+        </div>
+      )}
     </div>
   );
-}
+});

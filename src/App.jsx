@@ -1,7 +1,10 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFilters } from "./hooks/useFilters";
 import { useOptions } from "./hooks/useOptions";
 import { useSchools } from "./hooks/useSchools";
+import { MobileHeader } from "./components/MobileHeader";
+import { MobileBottomBar } from "./components/MobileBottomBar";
+import { MobileFilterSheet } from "./components/MobileFilterSheet";
 import { FilterPanel } from "./components/FilterPanel";
 import { SchoolCardGrid } from "./components/SchoolCardGrid";
 import { Pagination } from "./components/Pagination";
@@ -16,6 +19,20 @@ export default function App() {
   const { filters, setFilter, resetFilters } = useFilters();
   const { options } = useOptions(filters.stateId, filters.districtId, filters.blockId);
   const { rows, total, page, totalPages, loading, fetchSchools, goToPage } = useSchools();
+
+  // Fetch all schools on initial load
+  useEffect(() => {
+    fetchSchools({}, 1, PAGE_SIZE);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const [currentView, setCurrentView] = useState("search");
+  const [selectedSchool, setSelectedSchool] = useState(null);
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+
+  const activeFilterCount = useMemo(
+    () => Object.values(filters).filter((v) => v !== "").length,
+    [filters]
+  );
 
   const handleApply = useCallback(() => {
     fetchSchools(filters, 1, PAGE_SIZE);
@@ -33,9 +50,6 @@ export default function App() {
     [goToPage, filters]
   );
 
-  const [currentView, setCurrentView] = useState("search");
-  const [selectedSchool, setSelectedSchool] = useState(null);
-
   if (currentView === "edit" && selectedSchool) {
     return <EditSchoolPage school={selectedSchool} onBack={() => setCurrentView("search")} />;
   }
@@ -45,48 +59,62 @@ export default function App() {
 
   return (
     <div className="app-layout">
-      <header className="app-header">
-        <div>
-          <h1 className="app-title">School Directory</h1>
-          <p className="app-subtitle">Search and filter schools across India</p>
-        </div>
-        <nav className="header-nav">
-          <button
-            className="btn btn--outline btn--sm"
-            onClick={() => setCurrentView("review")}
-            type="button"
-          >
-            Review Edits
-          </button>
-        </nav>
-      </header>
+      <MobileHeader onNavigateReview={() => setCurrentView("review")} />
 
-      <FilterPanel
+      <div className="app-main">
+        <div className="app-content">
+          <FilterPanel
+            filters={filters}
+            options={options}
+            onFilterChange={setFilter}
+            onApply={handleApply}
+            onReset={handleReset}
+          />
+
+          <div className="results-bar">
+            <ResultsMeta loading={loading} total={total} page={page} pageSize={PAGE_SIZE} />
+          </div>
+
+          <SchoolCardGrid
+            rows={rows}
+            loading={loading}
+            onEdit={(school) => {
+              setSelectedSchool(school);
+              setCurrentView("edit");
+            }}
+          />
+
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            loading={loading}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      </div>
+
+      <MobileBottomBar
+        onToggleFilters={() => setFilterSheetOpen(true)}
+        activeFilterCount={activeFilterCount}
+        total={total}
+        loading={loading}
+      />
+
+      <MobileFilterSheet
+        isOpen={filterSheetOpen}
+        onClose={() => setFilterSheetOpen(false)}
         filters={filters}
         options={options}
         onFilterChange={setFilter}
-        onApply={handleApply}
-        onReset={handleReset}
-      />
-
-      <div className="results-bar">
-        <ResultsMeta loading={loading} total={total} page={page} pageSize={PAGE_SIZE} />
-      </div>
-
-      <SchoolCardGrid
-        rows={rows}
-        loading={loading}
-        onEdit={(school) => {
-          setSelectedSchool(school);
-          setCurrentView("edit");
+        onApply={() => {
+          handleApply();
+          setFilterSheetOpen(false);
         }}
-      />
-
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        loading={loading}
-        onPageChange={handlePageChange}
+        onReset={() => {
+          handleReset();
+          setFilterSheetOpen(false);
+        }}
+        activeFilterCount={activeFilterCount}
       />
     </div>
   );

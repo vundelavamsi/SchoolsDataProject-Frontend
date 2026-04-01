@@ -1,4 +1,4 @@
-export function FilterSelect({ label, name, value, options, onChange, disabled, placeholder }) {
+export function FilterSelect({ label, name, value, options, onChange, disabled, placeholder, "aria-label": ariaLabel }) {
   return (
     <div className="filter-field">
       <label className="filter-label" htmlFor={name}>
@@ -11,6 +11,7 @@ export function FilterSelect({ label, name, value, options, onChange, disabled, 
         onChange={(e) => onChange(name, e.target.value)}
         disabled={disabled}
         className="filter-select"
+        aria-label={ariaLabel || label}
       >
         <option value="">{placeholder || `All ${label}s`}</option>
         {(options ?? []).map((opt) => (

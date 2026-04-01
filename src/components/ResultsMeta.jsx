@@ -1,5 +1,5 @@
 export function ResultsMeta({ loading, total, page, pageSize }) {
-  if (loading) return <p className="results-meta">Loading…</p>;
+  if (loading) return <div className="results-meta-skeleton skeleton" />;
   if (!total) return null;
 
   const from = (page - 1) * pageSize + 1;
