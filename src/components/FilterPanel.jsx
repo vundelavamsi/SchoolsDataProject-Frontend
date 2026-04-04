@@ -77,30 +77,14 @@ export function FilterPanel({ filters, options, onFilterChange, onApply, onReset
       </div>
 
       <div className="filter-row filter-row--bottom">
-        <div className="filter-field filter-field--small">
-          <label className="filter-label" htmlFor="classFromMin">Class From</label>
-          <input
-            id="classFromMin"
-            type="text"
-            inputMode="numeric"
-            className="filter-input"
-            value={filters.classFromMin}
-            onChange={(e) => onFilterChange("classFromMin", e.target.value)}
-            placeholder="e.g. 1"
-          />
-        </div>
-        <div className="filter-field filter-field--small">
-          <label className="filter-label" htmlFor="classToMax">Class To</label>
-          <input
-            id="classToMax"
-            type="text"
-            inputMode="numeric"
-            className="filter-input"
-            value={filters.classToMax}
-            onChange={(e) => onFilterChange("classToMax", e.target.value)}
-            placeholder="e.g. 12"
-          />
-        </div>
+        <FilterSelect
+          label="Class Range"
+          name="classRange"
+          value={filters.classRange}
+          options={options.classRange}
+          onChange={onFilterChange}
+          placeholder="All Classes"
+        />
         <div className="filter-field filter-field--grow">
           <label className="filter-label" htmlFor="search">Search</label>
           <input

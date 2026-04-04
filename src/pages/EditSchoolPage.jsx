@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { maskUdise, displayValue } from "../lib/utils";
+import { buildUdise, displayValue } from "../lib/utils";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001";
 
@@ -73,7 +73,7 @@ export function EditSchoolPage({ school, onBack }) {
           <div className="page-card">
             <div className="school-context">
               <div className="school-context-name">{displayValue(school.schoolName)}</div>
-              <div className="school-context-udise">UDISE: {maskUdise(school.udiseschCode)}</div>
+              <div className="school-context-udise">UDISE: {buildUdise(school.blockCd, school.udiseschCode)}</div>
             </div>
 
             {hasPending && (

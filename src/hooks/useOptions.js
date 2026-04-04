@@ -11,6 +11,7 @@ const EMPTY_OPTIONS = {
   schType: [],
   schMgmtId: [],
   schoolStatus: [],
+  classRange: [],
 };
 
 export function useOptions(stateId, districtId, blockId) {
@@ -24,8 +25,9 @@ export function useOptions(stateId, districtId, blockId) {
     Promise.all([
       fetch(`${API_BASE}/api/options/states`, { signal }).then((r) => r.json()),
       fetch(`${API_BASE}/api/options`, { signal }).then((r) => r.json()),
+      fetch(`${API_BASE}/api/options/classRanges`, { signal }).then((r) => r.json()),
     ])
-      .then(([statesData, staticData]) => {
+      .then(([statesData, staticData, classData]) => {
         setOptions((prev) => ({
           ...prev,
           stateId: statesData.stateId || [],
@@ -33,6 +35,7 @@ export function useOptions(stateId, districtId, blockId) {
           schType: staticData.schType || [],
           schMgmtId: staticData.schMgmtId || [],
           schoolStatus: staticData.schoolStatus || [],
+          classRange: classData.classRange || [],
         }));
       })
       .catch((err) => {

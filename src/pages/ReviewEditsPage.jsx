@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { displayValue, maskUdise } from "../lib/utils";
+import { displayValue, buildUdise } from "../lib/utils";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001";
@@ -27,7 +27,7 @@ function EditCardView({ rows, inFlight, rowErrors, onAction }) {
           </div>
           <div className="edit-card-body">
             <div className="edit-card-meta">
-              <span>UDISE: <strong>{maskUdise(row.udiseschCode)}</strong></span>
+              <span>UDISE: <strong>{buildUdise(row.blockCd, row.udiseschCode)}</strong></span>
               <span>By: <strong>{displayValue(row.submittedBy)}</strong></span>
               <span>{row.submittedAt ? new Date(row.submittedAt).toLocaleDateString() : "—"}</span>
             </div>
@@ -91,7 +91,7 @@ function EditTableView({ rows, inFlight, rowErrors, onAction }) {
           {rows.map((row) => (
             <tr key={row.id}>
               <td>{displayValue(row.schoolName)}</td>
-              <td className="td-muted">{maskUdise(row.udiseschCode)}</td>
+              <td className="td-muted">{buildUdise(row.blockCd, row.udiseschCode)}</td>
               <td>{displayValue(row.oldValue)}</td>
               <td><strong>{displayValue(row.newValue)}</strong></td>
               <td>{displayValue(row.submittedBy)}</td>

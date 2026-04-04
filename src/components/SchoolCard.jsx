@@ -1,5 +1,5 @@
 import { memo, useState } from "react";
-import { maskUdise, formatClassRange, displayValue } from "../lib/utils";
+import { buildUdise, formatClassRange, displayValue } from "../lib/utils";
 
 function StatusBadge({ status, statusName }) {
   const name = displayValue(statusName, displayValue(status, "Unknown"));
@@ -25,7 +25,7 @@ export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
       <div className="card-header">
         <div className="card-header-top">
           <span className="card-udise">
-            UDISE: <strong>{maskUdise(school.udiseschCode)}</strong>
+            UDISE: <strong>{buildUdise(school.blockCd, school.udiseschCode)}</strong>
           </span>
           <StatusBadge status={school.schoolStatus} statusName={school.schoolStatusName} />
         </div>

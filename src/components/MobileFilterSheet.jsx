@@ -151,30 +151,14 @@ export function MobileFilterSheet({
           <div>
             <div className="filter-sheet-section-title">Class Range & Search</div>
             <div className="filter-sheet-section">
-              <div className="filter-sheet-row">
-                <div className="filter-field">
-                  <label className="filter-label">Class From</label>
-                  <input
-                    className="filter-input"
-                    type="text"
-                    inputMode="numeric"
-                    value={filters.classFromMin}
-                    onChange={(e) => onFilterChange("classFromMin", e.target.value)}
-                    placeholder="Min"
-                  />
-                </div>
-                <div className="filter-field">
-                  <label className="filter-label">Class To</label>
-                  <input
-                    className="filter-input"
-                    type="text"
-                    inputMode="numeric"
-                    value={filters.classToMax}
-                    onChange={(e) => onFilterChange("classToMax", e.target.value)}
-                    placeholder="Max"
-                  />
-                </div>
-              </div>
+              <FilterSelect
+                label="Class Range"
+                name="classRange"
+                value={filters.classRange}
+                options={options.classRange}
+                onChange={onFilterChange}
+                placeholder="All Classes"
+              />
               <div className="filter-field">
                 <label className="filter-label">Search</label>
                 <input

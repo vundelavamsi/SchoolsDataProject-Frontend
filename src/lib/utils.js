@@ -5,6 +5,16 @@ export function maskUdise(code) {
   return "******" + s.slice(6);
 }
 
+export function buildUdise(blockCd, udiseschCode) {
+  if (!udiseschCode) return "-";
+  const s = String(udiseschCode).trim();
+  const suffix = s.includes("******") ? s.replace("******", "") : (s.length > 6 ? s.slice(6) : s);
+  const prefix = blockCd ? String(blockCd).trim() : "";
+  if (prefix && suffix) return prefix + suffix;
+  if (prefix) return prefix;
+  return s;
+}
+
 export function formatClassRange(from, to) {
   if (!from && !to) return "-";
   if (from && to) return `${from} to ${to}`;

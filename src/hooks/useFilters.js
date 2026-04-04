@@ -9,8 +9,7 @@ const INITIAL_FILTERS = {
   schType: "",
   schMgmtId: "",
   schoolStatus: "",
-  classFromMin: "",
-  classToMax: "",
+  classRange: "",
   search: "",
 };
 
