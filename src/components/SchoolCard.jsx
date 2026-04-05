@@ -107,7 +107,7 @@ export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
               <span className="field-label">Management</span>
               <span className="field-value">{displayValue(school.schMgmtDesc)}</span>
             </div>
-            {school.schLocRuralUrban === "2" ? (
+            {school.schLocRuralUrban === "2" && (
               <>
                 <div className="field-row">
                   <span className="field-label">Urban Local Body</span>
@@ -118,16 +118,7 @@ export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
                   <span className="field-value">{displayValue(school.lgdwardName)}</span>
                 </div>
               </>
-            ) : (
-              <div className="field-row">
-                <span className="field-label">Panchayat</span>
-                <span className="field-value">{displayValue(school.lgdvillpanchayatName)}</span>
-              </div>
             )}
-            <div className="field-row">
-              <span className="field-label">LGD Block</span>
-              <span className="field-value">{displayValue(school.lgdblockName)}</span>
-            </div>
           </div>
         </div>
 
