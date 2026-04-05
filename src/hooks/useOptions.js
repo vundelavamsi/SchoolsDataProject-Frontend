@@ -11,6 +11,7 @@ const EMPTY_OPTIONS = {
   schType: [],
   schMgmtId: [],
   schoolStatus: [],
+  schLocRuralUrban: [],
   classRange: [],
 };
 
@@ -35,6 +36,7 @@ export function useOptions(stateId, districtId, blockId) {
           schType: staticData.schType || [],
           schMgmtId: staticData.schMgmtId || [],
           schoolStatus: staticData.schoolStatus || [],
+          schLocRuralUrban: staticData.schLocRuralUrban || [],
           classRange: classData.classRange || [],
         }));
       })

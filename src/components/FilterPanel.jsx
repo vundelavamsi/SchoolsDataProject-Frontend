@@ -74,6 +74,14 @@ export function FilterPanel({ filters, options, onFilterChange, onApply, onReset
           onChange={onFilterChange}
           placeholder="All Statuses"
         />
+        <FilterSelect
+          label="Rural/Urban"
+          name="schLocRuralUrban"
+          value={filters.schLocRuralUrban}
+          options={options.schLocRuralUrban}
+          onChange={onFilterChange}
+          placeholder="All"
+        />
       </div>
 
       <div className="filter-row filter-row--bottom">

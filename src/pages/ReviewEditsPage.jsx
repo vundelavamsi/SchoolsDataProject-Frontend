@@ -5,6 +5,7 @@ import { useMediaQuery } from "../hooks/useMediaQuery";
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001";
 const TABS = ["all", "pending", "approved", "rejected"];
 const TAB_LABELS = { all: "All", pending: "Pending", approved: "Approved", rejected: "Rejected" };
+const FIELD_LABELS = { villageName: "Village Name", gmapLocationLink: "Location Link" };
 
 function StatusBadge({ status }) {
   const cls =
@@ -31,6 +32,7 @@ function EditCardView({ rows, inFlight, rowErrors, onAction }) {
               <span>By: <strong>{displayValue(row.submittedBy)}</strong></span>
               <span>{row.submittedAt ? new Date(row.submittedAt).toLocaleDateString() : "—"}</span>
             </div>
+            <div className="edit-card-field-name">{FIELD_LABELS[row.fieldName] || row.fieldName}</div>
             <div className="edit-card-change">
               <span className="edit-card-old">{displayValue(row.oldValue)}</span>
               <span className="edit-card-arrow">&rarr;</span>
@@ -79,8 +81,9 @@ function EditTableView({ rows, inFlight, rowErrors, onAction }) {
           <tr>
             <th>School Name</th>
             <th>UDISE</th>
-            <th>Old Village</th>
-            <th>New Village</th>
+            <th>Field</th>
+            <th>Old Value</th>
+            <th>New Value</th>
             <th>Submitted By</th>
             <th>Submitted At</th>
             <th>Status</th>
@@ -92,6 +95,7 @@ function EditTableView({ rows, inFlight, rowErrors, onAction }) {
             <tr key={row.id}>
               <td>{displayValue(row.schoolName)}</td>
               <td className="td-muted">{buildUdise(row.blockCd, row.udiseschCode)}</td>
+              <td className="td-muted">{FIELD_LABELS[row.fieldName] || row.fieldName}</td>
               <td>{displayValue(row.oldValue)}</td>
               <td><strong>{displayValue(row.newValue)}</strong></td>
               <td>{displayValue(row.submittedBy)}</td>

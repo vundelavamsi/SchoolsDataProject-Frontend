@@ -144,6 +144,14 @@ export function MobileFilterSheet({
                   placeholder="All"
                 />
               </div>
+              <FilterSelect
+                label="Rural/Urban"
+                name="schLocRuralUrban"
+                value={filters.schLocRuralUrban}
+                options={options.schLocRuralUrban}
+                onChange={onFilterChange}
+                placeholder="All"
+              />
             </div>
           </div>
 

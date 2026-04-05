@@ -5,6 +5,7 @@ const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001";
 
 export function EditSchoolPage({ school, onBack }) {
   const [villageName, setVillageName] = useState(school.villageName ?? "");
+  const [gmapLocationLink, setGmapLocationLink] = useState(school.gmapLocationLink ?? "");
   const [submittedBy, setSubmittedBy] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(null);
@@ -20,34 +21,51 @@ export function EditSchoolPage({ school, onBack }) {
   }, [school.sourceKey]);
 
   const handleSave = async () => {
-    if (!villageName.trim() || !submittedBy.trim()) {
-      setMessage({ type: "error", text: "Both fields are required." });
+    if (!submittedBy.trim()) {
+      setMessage({ type: "error", text: "Submitted By is required." });
       return;
     }
-    if (villageName.trim() === (school.villageName ?? "").trim()) {
-      setMessage({ type: "error", text: "Village Name is unchanged. Please enter a different value." });
+
+    const villageChanged = villageName.trim() !== (school.villageName ?? "").trim();
+    const locationChanged = gmapLocationLink.trim() !== (school.gmapLocationLink ?? "").trim();
+
+    if (!villageChanged && !locationChanged) {
+      setMessage({ type: "error", text: "No changes made. Update at least one field." });
       return;
     }
+
     setSubmitting(true);
     setMessage(null);
+
     try {
-      const res = await fetch(`${API_BASE}/api/edits`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sourceKey: school.sourceKey,
-          fieldName: "villageName",
-          newValue: villageName.trim(),
-          submittedBy: submittedBy.trim(),
-        }),
-      });
-      if (res.status === 201) {
-        setMessage({ type: "success", text: "Edit submitted successfully." });
-        setTimeout(onBack, 1500);
-      } else {
-        const data = await res.json();
-        setMessage({ type: "error", text: data.error || "Submission failed." });
+      const edits = [];
+      if (villageChanged) {
+        edits.push({ fieldName: "villageName", newValue: villageName.trim() });
       }
+      if (locationChanged) {
+        edits.push({ fieldName: "gmapLocationLink", newValue: gmapLocationLink.trim() });
+      }
+
+      for (const edit of edits) {
+        const res = await fetch(`${API_BASE}/api/edits`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sourceKey: school.sourceKey,
+            ...edit,
+            submittedBy: submittedBy.trim(),
+          }),
+        });
+        if (res.status !== 201) {
+          const data = await res.json();
+          setMessage({ type: "error", text: data.error || "Submission failed." });
+          setSubmitting(false);
+          return;
+        }
+      }
+
+      setMessage({ type: "success", text: "Edit submitted successfully." });
+      setTimeout(onBack, 1500);
     } catch {
       setMessage({ type: "error", text: "Network error. Please try again." });
     } finally {
@@ -91,6 +109,20 @@ export function EditSchoolPage({ school, onBack }) {
                 inputMode="text"
                 value={villageName}
                 onChange={(e) => setVillageName(e.target.value)}
+                disabled={submitting}
+              />
+            </div>
+
+            <div className="form-field">
+              <label className="form-label" htmlFor="gmapLocationLink">Google Maps Location Link</label>
+              <input
+                id="gmapLocationLink"
+                className="form-input"
+                type="url"
+                inputMode="url"
+                value={gmapLocationLink}
+                onChange={(e) => setGmapLocationLink(e.target.value)}
+                placeholder="https://maps.google.com/..."
                 disabled={submitting}
               />
             </div>
