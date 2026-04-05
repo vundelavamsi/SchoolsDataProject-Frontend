@@ -62,7 +62,6 @@ export function MobileFilterSheet({
         <div className="filter-sheet-body">
           {/* Location */}
           <div>
-            <div className="filter-sheet-section-title">Location</div>
             <div className="filter-sheet-section">
               <FilterSelect
                 label="State"
@@ -81,32 +80,29 @@ export function MobileFilterSheet({
                 disabled={!filters.stateId}
                 placeholder="All Districts"
               />
-              <div className="filter-sheet-row">
-                <FilterSelect
-                  label="Block"
-                  name="blockId"
-                  value={filters.blockId}
-                  options={options.blockId}
-                  onChange={onFilterChange}
-                  disabled={!filters.districtId}
-                  placeholder="All Blocks"
-                />
-                <FilterSelect
-                  label="Village"
-                  name="villageId"
-                  value={filters.villageId}
-                  options={options.villageId}
-                  onChange={onFilterChange}
-                  disabled={!filters.blockId}
-                  placeholder="All Villages"
-                />
-              </div>
+              <FilterSelect
+                label="Block"
+                name="blockId"
+                value={filters.blockId}
+                options={options.blockId}
+                onChange={onFilterChange}
+                disabled={!filters.districtId}
+                placeholder="All Blocks"
+              />
+              <FilterSelect
+                label="Village"
+                name="villageId"
+                value={filters.villageId}
+                options={options.villageId}
+                onChange={onFilterChange}
+                disabled={!filters.blockId}
+                placeholder="All Villages"
+              />
             </div>
           </div>
 
           {/* Search */}
           <div>
-            <div className="filter-sheet-section-title">Search</div>
             <div className="filter-sheet-section">
               <div className="filter-field">
                 <label className="filter-label">Search</label>
