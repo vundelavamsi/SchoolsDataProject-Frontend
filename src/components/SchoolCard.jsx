@@ -68,14 +68,6 @@ export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
           {/* Location */}
           <div className="card-body-primary">
             <div className="field-row">
-              <span className="field-label">State</span>
-              <span className="field-value">{displayValue(school.stateName)}</span>
-            </div>
-            <div className="field-row">
-              <span className="field-label">District</span>
-              <span className="field-value">{displayValue(school.districtName)}</span>
-            </div>
-            <div className="field-row">
               <span className="field-label">Village</span>
               <span className="field-value">{displayValue(school.villageName)}</span>
             </div>
