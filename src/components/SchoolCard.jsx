@@ -27,7 +27,7 @@ export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
           <span className="card-udise">
             UDISE: <strong>{buildUdise(school.blockCd, school.udiseschCode)}</strong>
           </span>
-          <span className={`badge ${String(school.schMgmtDesc || "").toLowerCase().includes("private") ? "badge--private" : "badge--operational"}`}>{displayValue(school.schMgmtDesc, "—")}</span>
+          <span className="badge badge--private">{displayValue(school.schMgmtDesc, "—")}</span>
           <button
             className={`card-expand-toggle${expanded ? " expanded" : ""}`}
             type="button"
