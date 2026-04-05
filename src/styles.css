@@ -873,6 +873,11 @@ button, input, select, textarea {
   white-space: nowrap;
 }
 
+.card-category {
+  color: #D97706;
+  font-weight: 600;
+}
+
 /* Card Header - clickable on mobile */
 .card-header {
   cursor: pointer;
@@ -1030,6 +1035,12 @@ button, input, select, textarea {
     font-size: 11px;
     padding: 2px 10px;
   }
+}
+
+.badge--private {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  border: 1px solid var(--color-primary);
 }
 
 .badge--operational {
