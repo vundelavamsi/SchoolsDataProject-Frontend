@@ -27,7 +27,7 @@ export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
           <span className="card-udise">
             UDISE: <strong>{buildUdise(school.blockCd, school.udiseschCode)}</strong>
           </span>
-          <StatusBadge status={school.schoolStatus} statusName={school.schoolStatusName} />
+          <span className="badge badge--operational">{displayValue(school.schMgmtDesc, "—")}</span>
           <button
             className={`card-expand-toggle${expanded ? " expanded" : ""}`}
             type="button"
@@ -57,8 +57,7 @@ export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
           )}
         </div>
         <div className="card-geo">
-          {school.stateName && <span>State: {school.stateName}</span>}
-          {school.districtName && <span>Edu. District: {school.districtName}</span>}
+          {school.schCatDesc && <span>Category: {school.schCatDesc}</span>}
           {school.blockName && <span>Edu. Block: {school.blockName}</span>}
           {school.villageName && <span>Village: {school.villageName}</span>}
         </div>
@@ -66,41 +65,19 @@ export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
 
       <div className={`card-collapsible${expanded ? " card-collapsible--open" : ""}`}>
         <div className="card-body">
+          {/* Location */}
           <div className="card-body-primary">
             <div className="field-row">
-              <span className="field-label">School Category</span>
-              <span className="field-value">{displayValue(school.schCatDesc)}</span>
+              <span className="field-label">State</span>
+              <span className="field-value">{displayValue(school.stateName)}</span>
             </div>
             <div className="field-row">
-              <span className="field-label">Class Range</span>
-              <span className="field-value">{formatClassRange(school.classFrm, school.classTo)}</span>
+              <span className="field-label">District</span>
+              <span className="field-value">{displayValue(school.districtName)}</span>
             </div>
             <div className="field-row">
-              <span className="field-label">School Location</span>
-              <span className="field-value">{displayValue(school.schLocDesc)}</span>
-            </div>
-            <div className="field-row">
-              <span className="field-label">Management</span>
-              <span className="field-value">{displayValue(school.schMgmtDesc)}</span>
-            </div>
-            <div className="field-row">
-              <span className="field-label">School Type</span>
-              <span className="field-value">{displayValue(school.schTypeDesc)}</span>
-            </div>
-            <div className="field-row">
-              <span className="field-label">LGD Panchayat</span>
-              <span className="field-value">{displayValue(school.lgdvillpanchayatName)}</span>
-            </div>
-          </div>
-
-          <div className="card-body-secondary-always">
-            <div className="field-row">
-              <span className="field-label">LGD Block</span>
-              <span className="field-value">{displayValue(school.lgdblockName)}</span>
-            </div>
-            <div className="field-row">
-              <span className="field-label">LGD Village</span>
-              <span className="field-value">{displayValue(school.lgdvillName)}</span>
+              <span className="field-label">Village</span>
+              <span className="field-value">{displayValue(school.villageName)}</span>
             </div>
             <div className="field-row">
               <span className="field-label">Address</span>
@@ -110,12 +87,47 @@ export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
               <span className="field-label">PIN Code</span>
               <span className="field-value">{displayValue(school.pincode)}</span>
             </div>
-            {school.lastmodifiedTime && (
+            <div className="field-row">
+              <span className="field-label">Rural / Urban</span>
+              <span className="field-value">{displayValue(school.schLocDesc)}</span>
+            </div>
+          </div>
+
+          {/* School Classification */}
+          <div className="card-body-secondary-always">
+            <div className="field-row">
+              <span className="field-label">School Type</span>
+              <span className="field-value">{displayValue(school.schTypeDesc)}</span>
+            </div>
+            <div className="field-row">
+              <span className="field-label">Class Range</span>
+              <span className="field-value">{formatClassRange(school.classFrm, school.classTo)}</span>
+            </div>
+            <div className="field-row">
+              <span className="field-label">Management</span>
+              <span className="field-value">{displayValue(school.schMgmtDesc)}</span>
+            </div>
+            {school.schLocRuralUrban === "2" ? (
+              <>
+                <div className="field-row">
+                  <span className="field-label">Urban Local Body</span>
+                  <span className="field-value">{displayValue(school.lgdurbanlocalbodyName)}</span>
+                </div>
+                <div className="field-row">
+                  <span className="field-label">Ward</span>
+                  <span className="field-value">{displayValue(school.lgdwardName)}</span>
+                </div>
+              </>
+            ) : (
               <div className="field-row">
-                <span className="field-label">Last Modified</span>
-                <span className="field-value field-value--muted">{school.lastmodifiedTime}</span>
+                <span className="field-label">Panchayat</span>
+                <span className="field-value">{displayValue(school.lgdvillpanchayatName)}</span>
               </div>
             )}
+            <div className="field-row">
+              <span className="field-label">LGD Block</span>
+              <span className="field-value">{displayValue(school.lgdblockName)}</span>
+            </div>
           </div>
         </div>
 

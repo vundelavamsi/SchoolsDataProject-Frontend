@@ -41,58 +41,7 @@ export function FilterPanel({ filters, options, onFilterChange, onApply, onReset
         />
       </div>
 
-      <div className="filter-row">
-        <FilterSelect
-          label="Category"
-          name="schCategoryId"
-          value={filters.schCategoryId}
-          options={options.schCategoryId}
-          onChange={onFilterChange}
-          placeholder="All Categories"
-        />
-        <FilterSelect
-          label="Type"
-          name="schType"
-          value={filters.schType}
-          options={options.schType}
-          onChange={onFilterChange}
-          placeholder="All Types"
-        />
-        <FilterSelect
-          label="Management"
-          name="schMgmtId"
-          value={filters.schMgmtId}
-          options={options.schMgmtId}
-          onChange={onFilterChange}
-          placeholder="All Management"
-        />
-        <FilterSelect
-          label="Status"
-          name="schoolStatus"
-          value={filters.schoolStatus}
-          options={options.schoolStatus}
-          onChange={onFilterChange}
-          placeholder="All Statuses"
-        />
-        <FilterSelect
-          label="Rural/Urban"
-          name="schLocRuralUrban"
-          value={filters.schLocRuralUrban}
-          options={options.schLocRuralUrban}
-          onChange={onFilterChange}
-          placeholder="All"
-        />
-      </div>
-
       <div className="filter-row filter-row--bottom">
-        <FilterSelect
-          label="Class Range"
-          name="classRange"
-          value={filters.classRange}
-          options={options.classRange}
-          onChange={onFilterChange}
-          placeholder="All Classes"
-        />
         <div className="filter-field filter-field--grow">
           <label className="filter-label" htmlFor="search">Search</label>
           <input
