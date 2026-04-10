@@ -1,8 +1,9 @@
 import { useState, useCallback, useRef } from "react";
+import { buildAccessHeaders } from "../lib/access";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001";
 
-export function useSchools() {
+export function useSchools(phone) {
   const [rows, setRows] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -30,6 +31,7 @@ export function useSchools() {
 
       const res = await fetch(`${API_BASE}/api/schools?${params}`, {
         signal: controller.signal,
+        headers: buildAccessHeaders(phone),
       });
       const data = await res.json();
 
@@ -42,7 +44,7 @@ export function useSchools() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [phone]);
 
   const goToPage = useCallback(
     (newPage, filters, pageSize = 25) => {

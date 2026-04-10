@@ -1630,6 +1630,37 @@ button, input, select, textarea {
   flex: 1;
 }
 
+.access-panel {
+  margin-bottom: 12px;
+}
+
+.access-panel-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.access-panel-title {
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.access-panel-meta {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.access-panel-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.access-panel-actions .form-input {
+  flex: 1;
+}
+
 /* ----------------------------------------------------------
    20. Spinner
    ---------------------------------------------------------- */

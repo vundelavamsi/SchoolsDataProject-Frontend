@@ -1,4 +1,4 @@
-export function MobileHeader({ onNavigateReview }) {
+export function MobileHeader({ onNavigateReview, canReview, canEdit }) {
   return (
     <header className="app-header">
       <div className="header-left">
@@ -6,13 +6,15 @@ export function MobileHeader({ onNavigateReview }) {
         <p className="app-subtitle">Search and filter schools across India</p>
       </div>
       <nav className="header-nav">
-        <button
-          className="btn btn--outline btn--sm"
-          onClick={onNavigateReview}
-          type="button"
-        >
-          Review Edits
-        </button>
+        {canEdit || canReview ? (
+          <button
+            className="btn btn--outline btn--sm"
+            onClick={onNavigateReview}
+            type="button"
+          >
+            {canReview ? "Review Edits" : "My Edits"}
+          </button>
+        ) : null}
       </nav>
     </header>
   );
