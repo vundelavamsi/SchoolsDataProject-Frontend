@@ -8,10 +8,14 @@ export function useSchools(phone) {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [apiFailed, setApiFailed] = useState(false);
   const abortRef = useRef(null);
+  const requestIdRef = useRef(0);
 
   const fetchSchools = useCallback(async (filters, pageNum = 1, pageSize = 25) => {
+    const requestId = ++requestIdRef.current;
+
     // Cancel any in-flight request
     if (abortRef.current) abortRef.current.abort();
     const controller = new AbortController();
@@ -33,16 +37,31 @@ export function useSchools(phone) {
         signal: controller.signal,
         headers: buildAccessHeaders(phone),
       });
+      if (!res.ok) {
+        throw new Error(`Schools API failed with status ${res.status}`);
+      }
       const data = await res.json();
+      if (requestId !== requestIdRef.current) return;
 
       setRows(data.data || []);
       setTotal(data.total || 0);
       setPage(data.page || 1);
       setTotalPages(data.totalPages || 0);
+      setApiFailed(false);
     } catch (err) {
-      if (err.name !== "AbortError") console.error("Failed to fetch schools", err);
+      if (err.name !== "AbortError") {
+        if (requestId !== requestIdRef.current) return;
+        console.error("Failed to fetch schools", err);
+        setApiFailed(true);
+        setRows([]);
+        setTotal(0);
+        setPage(1);
+        setTotalPages(0);
+      }
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+      }
     }
   }, [phone]);
 
@@ -54,5 +73,5 @@ export function useSchools(phone) {
     [fetchSchools, totalPages]
   );
 
-  return { rows, total, page, totalPages, loading, fetchSchools, goToPage };
+  return { rows, total, page, totalPages, loading, apiFailed, fetchSchools, goToPage };
 }
