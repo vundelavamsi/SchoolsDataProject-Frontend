@@ -2,6 +2,11 @@
 
 React + Vite UI for filtering schools.
 
+The app now supports optional mock phone access:
+- Guest users can browse data without phone login
+- Entering a configured phone enables role-based edit/review features
+- Changing phone number updates permissions and scope in real time
+
 ## Setup
 
 ```bash

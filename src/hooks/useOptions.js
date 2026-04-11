@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { buildAccessHeaders } from "../lib/access";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001";
 
@@ -15,7 +16,7 @@ const EMPTY_OPTIONS = {
   classRange: [],
 };
 
-export function useOptions(stateId, districtId, blockId) {
+export function useOptions(stateId, districtId, blockId, phone) {
   const [options, setOptions] = useState(EMPTY_OPTIONS);
 
   // On mount: fetch states + static options in parallel
@@ -24,9 +25,9 @@ export function useOptions(stateId, districtId, blockId) {
     const { signal } = controller;
 
     Promise.all([
-      fetch(`${API_BASE}/api/options/states`, { signal }).then((r) => r.json()),
-      fetch(`${API_BASE}/api/options`, { signal }).then((r) => r.json()),
-      fetch(`${API_BASE}/api/options/classRanges`, { signal }).then((r) => r.json()),
+      fetch(`${API_BASE}/api/options/states`, { signal, headers: buildAccessHeaders(phone) }).then((r) => r.json()),
+      fetch(`${API_BASE}/api/options`, { signal, headers: buildAccessHeaders(phone) }).then((r) => r.json()),
+      fetch(`${API_BASE}/api/options/classRanges`, { signal, headers: buildAccessHeaders(phone) }).then((r) => r.json()),
     ])
       .then(([statesData, staticData, classData]) => {
         setOptions((prev) => ({
@@ -45,7 +46,7 @@ export function useOptions(stateId, districtId, blockId) {
       });
 
     return () => controller.abort();
-  }, []);
+  }, [phone]);
 
   // On stateId change: fetch districts
   useEffect(() => {
@@ -57,7 +58,7 @@ export function useOptions(stateId, districtId, blockId) {
     if (!stateId) return () => controller.abort();
 
     const url = `${API_BASE}/api/options/districts?stateId=${encodeURIComponent(stateId)}`;
-    fetch(url, { signal })
+    fetch(url, { signal, headers: buildAccessHeaders(phone) })
       .then((r) => r.json())
       .then((data) => {
         setOptions((prev) => ({ ...prev, districtId: data.districtId || [] }));
@@ -67,7 +68,7 @@ export function useOptions(stateId, districtId, blockId) {
       });
 
     return () => controller.abort();
-  }, [stateId]);
+  }, [stateId, phone]);
 
   // On districtId change: fetch blocks
   useEffect(() => {
@@ -82,7 +83,7 @@ export function useOptions(stateId, districtId, blockId) {
     if (stateId) params.set("stateId", stateId);
     params.set("districtId", districtId);
 
-    fetch(`${API_BASE}/api/options/blocks?${params}`, { signal })
+    fetch(`${API_BASE}/api/options/blocks?${params}`, { signal, headers: buildAccessHeaders(phone) })
       .then((r) => r.json())
       .then((data) => {
         setOptions((prev) => ({ ...prev, blockId: data.blockId || [] }));
@@ -92,7 +93,7 @@ export function useOptions(stateId, districtId, blockId) {
       });
 
     return () => controller.abort();
-  }, [stateId, districtId]);
+  }, [stateId, districtId, phone]);
 
   // On blockId change: fetch villages
   useEffect(() => {
@@ -104,7 +105,7 @@ export function useOptions(stateId, districtId, blockId) {
     if (!blockId) return () => controller.abort();
 
     const params = new URLSearchParams({ districtId: districtId || "", blockId });
-    fetch(`${API_BASE}/api/options/villages?${params}`, { signal })
+    fetch(`${API_BASE}/api/options/villages?${params}`, { signal, headers: buildAccessHeaders(phone) })
       .then((r) => r.json())
       .then((data) => {
         setOptions((prev) => ({ ...prev, villageId: data.villageId || [] }));
@@ -114,7 +115,7 @@ export function useOptions(stateId, districtId, blockId) {
       });
 
     return () => controller.abort();
-  }, [districtId, blockId]);
+  }, [districtId, blockId, phone]);
 
   return { options };
 }

@@ -1,26 +1,75 @@
 import { useState, useEffect } from "react";
 import { buildUdise, displayValue } from "../lib/utils";
+import { buildAccessHeaders } from "../lib/access";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001";
 
-export function EditSchoolPage({ school, onBack }) {
+function toGoogleMapsLink(lat, lng) {
+  return `https://maps.google.com/?q=${encodeURIComponent(`${lat},${lng}`)}`;
+}
+
+export function EditSchoolPage({ school, onBack, phone, canEdit }) {
   const [villageName, setVillageName] = useState(school.villageName ?? "");
   const [gmapLocationLink, setGmapLocationLink] = useState(school.gmapLocationLink ?? "");
   const [submittedBy, setSubmittedBy] = useState("");
+  const [locationTab, setLocationTab] = useState("manual");
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(null);
   const [hasPending, setHasPending] = useState(false);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/edits/school/${encodeURIComponent(school.sourceKey)}`)
+    if (!canEdit || !phone) {
+      setHasPending(false);
+      return;
+    }
+    fetch(`${API_BASE}/api/edits/school/${encodeURIComponent(school.sourceKey)}`, {
+      headers: buildAccessHeaders(phone),
+    })
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data) && data.length > 0) setHasPending(true);
+        setHasPending(Array.isArray(data) && data.length > 0);
       })
       .catch(() => {});
-  }, [school.sourceKey]);
+  }, [school.sourceKey, phone, canEdit]);
+
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+      setGeoError("Geolocation is not supported in this browser.");
+      return;
+    }
+
+    setGeoLoading(true);
+    setGeoError("");
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const generatedLink = toGoogleMapsLink(latitude, longitude);
+        setGmapLocationLink(generatedLink);
+        setGeoLoading(false);
+      },
+      (error) => {
+        if (error.code === error.PERMISSION_DENIED) {
+          setGeoError("Location permission denied. Please allow location access and try again.");
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          setGeoError("Unable to detect current location.");
+        } else if (error.code === error.TIMEOUT) {
+          setGeoError("Location request timed out. Please try again.");
+        } else {
+          setGeoError("Unable to detect current location.");
+        }
+        setGeoLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 15000 }
+    );
+  };
 
   const handleSave = async () => {
+    if (!canEdit) {
+      setMessage({ type: "error", text: "This phone number does not have edit access." });
+      return;
+    }
     if (!submittedBy.trim()) {
       setMessage({ type: "error", text: "Submitted By is required." });
       return;
@@ -49,7 +98,10 @@ export function EditSchoolPage({ school, onBack }) {
       for (const edit of edits) {
         const res = await fetch(`${API_BASE}/api/edits`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...buildAccessHeaders(phone),
+          },
           body: JSON.stringify({
             sourceKey: school.sourceKey,
             ...edit,
@@ -114,17 +166,54 @@ export function EditSchoolPage({ school, onBack }) {
             </div>
 
             <div className="form-field">
-              <label className="form-label" htmlFor="gmapLocationLink">Google Maps Location Link</label>
-              <input
-                id="gmapLocationLink"
-                className="form-input"
-                type="url"
-                inputMode="url"
-                value={gmapLocationLink}
-                onChange={(e) => setGmapLocationLink(e.target.value)}
-                placeholder="https://maps.google.com/..."
-                disabled={submitting}
-              />
+              <label className="form-label">School Location</label>
+              <div className="tab-bar">
+                <button
+                  className={`tab-btn${locationTab === "manual" ? " tab-btn--active" : ""}`}
+                  type="button"
+                  onClick={() => setLocationTab("manual")}
+                >
+                  Manual Link
+                </button>
+                <button
+                  className={`tab-btn${locationTab === "auto" ? " tab-btn--active" : ""}`}
+                  type="button"
+                  onClick={() => setLocationTab("auto")}
+                >
+                  Auto Detect
+                </button>
+              </div>
+              {locationTab === "manual" ? (
+                <input
+                  id="gmapLocationLink"
+                  className="form-input"
+                  type="url"
+                  inputMode="url"
+                  value={gmapLocationLink}
+                  onChange={(e) => setGmapLocationLink(e.target.value)}
+                  placeholder="https://maps.google.com/..."
+                  disabled={submitting}
+                />
+              ) : (
+                <div>
+                  <button
+                    className="btn btn--outline btn--sm"
+                    type="button"
+                    onClick={handleDetectLocation}
+                    disabled={geoLoading || submitting}
+                  >
+                    {geoLoading ? "Detecting..." : "Detect Current Location"}
+                  </button>
+                  {geoError && <div className="inline-error" style={{ marginTop: 8 }}>{geoError}</div>}
+                  {gmapLocationLink && (
+                    <div style={{ marginTop: 8 }}>
+                      <a href={gmapLocationLink} target="_blank" rel="noopener noreferrer">
+                        Preview detected Google Maps link
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="form-field">
@@ -151,12 +240,17 @@ export function EditSchoolPage({ school, onBack }) {
               <button
                 className="btn btn--primary"
                 onClick={handleSave}
-                disabled={submitting}
+                disabled={submitting || !canEdit}
                 type="button"
               >
                 {submitting ? "Saving..." : "Save Edit"}
               </button>
             </div>
+            {!canEdit && (
+              <div className="inline-warning" style={{ marginTop: 12 }}>
+                You can view this page, but this phone number cannot submit edits.
+              </div>
+            )}
           </div>
         </div>
       </div>

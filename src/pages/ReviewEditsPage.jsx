@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { displayValue, buildUdise } from "../lib/utils";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { buildAccessHeaders } from "../lib/access";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001";
 const TABS = ["all", "pending", "approved", "rejected"];
@@ -17,7 +18,7 @@ function StatusBadge({ status }) {
   return <span className={cls}>{status}</span>;
 }
 
-function EditCardView({ rows, inFlight, rowErrors, onAction }) {
+function EditCardView({ rows, inFlight, rowErrors, onAction, canReview }) {
   return (
     <div className="edit-cards">
       {rows.map((row) => (
@@ -47,7 +48,7 @@ function EditCardView({ rows, inFlight, rowErrors, onAction }) {
               <div className="row-error">{rowErrors[row.id]}</div>
             )}
           </div>
-          {row.status === "pending" && (
+          {row.status === "pending" && canReview && (
             <div className="edit-card-actions">
               <button
                 className="btn btn--success btn--sm"
@@ -73,7 +74,7 @@ function EditCardView({ rows, inFlight, rowErrors, onAction }) {
   );
 }
 
-function EditTableView({ rows, inFlight, rowErrors, onAction }) {
+function EditTableView({ rows, inFlight, rowErrors, onAction, canReview }) {
   return (
     <div className="edits-table-wrapper">
       <table className="edits-table">
@@ -111,7 +112,7 @@ function EditTableView({ rows, inFlight, rowErrors, onAction }) {
                 )}
               </td>
               <td>
-                {row.status === "pending" ? (
+                {row.status === "pending" && canReview ? (
                   <div>
                     <div className="td-actions">
                       <button
@@ -145,7 +146,7 @@ function EditTableView({ rows, inFlight, rowErrors, onAction }) {
   );
 }
 
-export function ReviewEditsPage({ onBack }) {
+export function ReviewEditsPage({ onBack, phone, canReview, canEdit }) {
   const [activeTab, setActiveTab] = useState("all");
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -154,13 +155,17 @@ export function ReviewEditsPage({ onBack }) {
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   const fetchEdits = useCallback(async (tab) => {
+    if (!canReview && !canEdit) {
+      setRows([]);
+      return;
+    }
     setLoading(true);
     try {
       const url =
         tab === "all"
           ? `${API_BASE}/api/edits`
           : `${API_BASE}/api/edits?status=${tab}`;
-      const res = await fetch(url);
+      const res = await fetch(url, { headers: buildAccessHeaders(phone) });
       const data = await res.json();
       setRows(Array.isArray(data) ? data : []);
     } catch {
@@ -168,17 +173,21 @@ export function ReviewEditsPage({ onBack }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [canReview, canEdit, phone]);
 
   useEffect(() => {
     fetchEdits(activeTab);
   }, [activeTab, fetchEdits]);
 
   const handleAction = async (id, action) => {
+    if (!canReview) return;
     setInFlight((prev) => ({ ...prev, [id]: true }));
     setRowErrors((prev) => ({ ...prev, [id]: null }));
     try {
-      const res = await fetch(`${API_BASE}/api/edits/${id}/${action}`, { method: "POST" });
+      const res = await fetch(`${API_BASE}/api/edits/${id}/${action}`, {
+        method: "POST",
+        headers: buildAccessHeaders(phone),
+      });
       if (res.ok) {
         fetchEdits(activeTab);
       } else {
@@ -196,7 +205,7 @@ export function ReviewEditsPage({ onBack }) {
     <div className="app-layout">
       <header className="app-header">
         <div className="header-left">
-          <h1 className="app-title">Edit Requests</h1>
+          <h1 className="app-title">{canReview ? "Edit Requests" : "My Edit Requests"}</h1>
         </div>
         <nav className="header-nav">
           <button className="btn btn--outline btn--sm" onClick={onBack} type="button">
@@ -225,6 +234,10 @@ export function ReviewEditsPage({ onBack }) {
               <div className="spinner" aria-label="Loading" />
               <p>Loading...</p>
             </div>
+          ) : !canReview && !canEdit ? (
+            <div className="card-grid-state">
+              <p className="no-results">This phone number does not have edit or review permission.</p>
+            </div>
           ) : rows.length === 0 ? (
             <div className="card-grid-state">
               <p className="no-results">No edit requests found.</p>
@@ -235,6 +248,7 @@ export function ReviewEditsPage({ onBack }) {
               inFlight={inFlight}
               rowErrors={rowErrors}
               onAction={handleAction}
+              canReview={canReview}
             />
           ) : (
             <EditTableView
@@ -242,6 +256,7 @@ export function ReviewEditsPage({ onBack }) {
               inFlight={inFlight}
               rowErrors={rowErrors}
               onAction={handleAction}
+              canReview={canReview}
             />
           )}
         </div>
