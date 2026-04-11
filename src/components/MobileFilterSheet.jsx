@@ -101,22 +101,6 @@ export function MobileFilterSheet({
             </div>
           </div>
 
-          {/* Search */}
-          <div>
-            <div className="filter-sheet-section">
-              <div className="filter-field">
-                <label className="filter-label">Search</label>
-                <input
-                  className="filter-input"
-                  type="search"
-                  inputMode="search"
-                  value={filters.search}
-                  onChange={(e) => onFilterChange("search", e.target.value)}
-                  placeholder="School name, UDISE code..."
-                />
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className="filter-sheet-footer">

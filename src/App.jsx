@@ -6,11 +6,13 @@ import { useAccess } from "./hooks/useAccess";
 import { MobileHeader } from "./components/MobileHeader";
 import { MobileBottomBar } from "./components/MobileBottomBar";
 import { MobileFilterSheet } from "./components/MobileFilterSheet";
+import { PhoneAccessModal } from "./components/PhoneAccessModal";
 import { FilterPanel } from "./components/FilterPanel";
 import { SchoolCardGrid } from "./components/SchoolCardGrid";
 import { Pagination } from "./components/Pagination";
 import { ResultsMeta } from "./components/ResultsMeta";
 import { EditSchoolPage } from "./pages/EditSchoolPage";
+import { ProfilePage } from "./pages/ProfilePage";
 import { ReviewEditsPage } from "./pages/ReviewEditsPage";
 import "./styles.css";
 
@@ -18,23 +20,22 @@ const PAGE_SIZE = 25;
 
 export default function App() {
   const { phone, access, loading: accessLoading, error: accessError, setPhoneAndResolve } = useAccess();
-  const [phoneInput, setPhoneInput] = useState(phone);
   const { filters, setFilter, resetFilters } = useFilters();
   const { options } = useOptions(filters.stateId, filters.districtId, filters.blockId, phone);
-  const { rows, total, page, totalPages, loading, fetchSchools, goToPage } = useSchools(phone);
+  const { rows, total, page, totalPages, loading, apiFailed, fetchSchools, goToPage } = useSchools(phone);
 
   useEffect(() => {
-    setPhoneInput(phone);
     fetchSchools(filters, 1, PAGE_SIZE);
   }, [phone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [currentView, setCurrentView] = useState("search");
   const [selectedSchool, setSelectedSchool] = useState(null);
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [accessModalOpen, setAccessModalOpen] = useState(false);
 
   useEffect(() => {
     if (currentView === "review" && !access.canEdit && !access.canReview) {
-      setCurrentView("search");
+      setCurrentView("profile");
     }
   }, [currentView, access.canReview, access.canEdit]);
 
@@ -46,6 +47,16 @@ export default function App() {
   const handleApply = useCallback(() => {
     fetchSchools(filters, 1, PAGE_SIZE);
   }, [filters, fetchSchools]);
+
+  const handleMobileSearchApply = useCallback(
+    (searchValue) => {
+      if (filters.search !== searchValue) {
+        setFilter("search", searchValue);
+      }
+      fetchSchools({ ...filters, search: searchValue }, 1, PAGE_SIZE);
+    },
+    [filters, setFilter, fetchSchools]
+  );
 
   const handleReset = useCallback(() => {
     resetFilters();
@@ -59,9 +70,12 @@ export default function App() {
     [goToPage, filters]
   );
 
-  const handleApplyPhone = useCallback(() => {
-    setPhoneAndResolve(phoneInput);
-  }, [setPhoneAndResolve, phoneInput]);
+  const handleApplyPhone = useCallback(
+    (phoneValue) => {
+      setPhoneAndResolve(phoneValue);
+    },
+    [setPhoneAndResolve]
+  );
 
   const handleClearPhone = useCallback(() => {
     setPhoneAndResolve("");
@@ -83,114 +97,117 @@ export default function App() {
         phone={phone}
         canReview={access.canReview}
         canEdit={access.canEdit}
-        onBack={() => setCurrentView("search")}
+        onBack={() => setCurrentView("profile")}
       />
+    );
+  }
+  if (currentView === "profile") {
+    return (
+      <>
+        <ProfilePage
+          phone={phone}
+          access={access}
+          accessLoading={accessLoading}
+          accessError={accessError}
+          onOpenAccessModal={() => setAccessModalOpen(true)}
+          onNavigateReview={() => setCurrentView("review")}
+          onBack={() => setCurrentView("search")}
+        />
+        <PhoneAccessModal
+          isOpen={accessModalOpen}
+          onClose={() => setAccessModalOpen(false)}
+          phone={phone}
+          access={access}
+          accessLoading={accessLoading}
+          accessError={accessError}
+          onApplyPhone={handleApplyPhone}
+          onClearPhone={handleClearPhone}
+        />
+      </>
     );
   }
 
   return (
-    <div className="app-layout">
-      <MobileHeader
-        onNavigateReview={() => setCurrentView("review")}
-        canReview={access.canReview}
-        canEdit={access.canEdit}
-      />
+      <>
+      <div className="app-layout">
+        <MobileHeader
+          onNavigateProfile={() => setCurrentView("profile")}
+          searchValue={filters.search}
+          onSearchChange={(value) => setFilter("search", value)}
+          onSearchApply={handleMobileSearchApply}
+        />
 
-      <div className="app-main">
-        <div className="app-content">
-          <div className="page-card access-panel">
-            <div className="access-panel-row">
-              <div>
-                <div className="access-panel-title">Phone access (optional)</div>
-                <div className="access-panel-meta">
-                  {phone
-                    ? access.authenticated
-                      ? `Logged as ${phone} · ${access.role} · ${access.scope === "global" ? "global scope" : `${access.blockIds.length} block(s)`}`
-                      : `Phone ${phone} has no configured permissions`
-                    : "Guest mode: browsing enabled"}
-                </div>
-              </div>
-              {accessLoading && <span className="badge badge--other">Checking…</span>}
+        <div className="app-main">
+          <div className="app-content">
+            <FilterPanel
+              filters={filters}
+              options={options}
+              onFilterChange={setFilter}
+              onApply={handleApply}
+              onReset={handleReset}
+            />
+
+            <div className="results-bar">
+              <ResultsMeta loading={loading} total={total} page={page} pageSize={PAGE_SIZE} />
             </div>
-            <div className="access-panel-actions">
-              <input
-                className="form-input"
-                type="tel"
-                inputMode="tel"
-                value={phoneInput}
-                onChange={(e) => setPhoneInput(e.target.value)}
-                placeholder="Enter phone number"
-              />
-              <button className="btn btn--primary btn--sm" type="button" onClick={handleApplyPhone}>
-                Apply
-              </button>
-              <button className="btn btn--outline btn--sm" type="button" onClick={handleClearPhone}>
-                Clear
-              </button>
-            </div>
-            {!access.canEdit && phone && access.authenticated && (
-              <div className="inline-warning">This phone can browse data but cannot submit edits.</div>
-            )}
-            {accessError && <div className="inline-error">{accessError}</div>}
+
+            <SchoolCardGrid
+              rows={rows}
+              loading={loading}
+              apiFailed={apiFailed}
+              onEdit={
+                access.canEdit
+                  ? (school) => {
+                      setSelectedSchool(school);
+                      setCurrentView("edit");
+                    }
+                  : undefined
+              }
+            />
+
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              loading={loading}
+              onPageChange={handlePageChange}
+            />
           </div>
-
-          <FilterPanel
-            filters={filters}
-            options={options}
-            onFilterChange={setFilter}
-            onApply={handleApply}
-            onReset={handleReset}
-          />
-
-          <div className="results-bar">
-            <ResultsMeta loading={loading} total={total} page={page} pageSize={PAGE_SIZE} />
-          </div>
-
-          <SchoolCardGrid
-            rows={rows}
-            loading={loading}
-            onEdit={
-              access.canEdit
-                ? (school) => {
-                    setSelectedSchool(school);
-                    setCurrentView("edit");
-                  }
-                : undefined
-            }
-          />
-
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            loading={loading}
-            onPageChange={handlePageChange}
-          />
         </div>
+
+        <MobileBottomBar
+          onToggleFilters={() => setFilterSheetOpen(true)}
+          activeFilterCount={activeFilterCount}
+          total={total}
+          loading={loading}
+        />
+
+        <MobileFilterSheet
+          isOpen={filterSheetOpen}
+          onClose={() => setFilterSheetOpen(false)}
+          filters={filters}
+          options={options}
+          onFilterChange={setFilter}
+          onApply={() => {
+            handleApply();
+            setFilterSheetOpen(false);
+          }}
+          onReset={() => {
+            handleReset();
+            setFilterSheetOpen(false);
+          }}
+          activeFilterCount={activeFilterCount}
+        />
       </div>
-
-      <MobileBottomBar
-        onToggleFilters={() => setFilterSheetOpen(true)}
-        activeFilterCount={activeFilterCount}
-        total={total}
-        loading={loading}
+      <PhoneAccessModal
+        isOpen={accessModalOpen}
+        onClose={() => setAccessModalOpen(false)}
+        phone={phone}
+        access={access}
+        accessLoading={accessLoading}
+        accessError={accessError}
+        onApplyPhone={handleApplyPhone}
+        onClearPhone={handleClearPhone}
       />
-
-      <MobileFilterSheet
-        isOpen={filterSheetOpen}
-        onClose={() => setFilterSheetOpen(false)}
-        filters={filters}
-        options={options}
-        onFilterChange={setFilter}
-        onApply={() => {
-          handleApply();
-          setFilterSheetOpen(false);
-        }}
-        onReset={() => {
-          handleReset();
-          setFilterSheetOpen(false);
-        }}
-        activeFilterCount={activeFilterCount}
-      />
-    </div>
+    </>
   );
 }
