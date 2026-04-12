@@ -17,6 +17,13 @@ const ChevronDown = () => (
   </svg>
 );
 
+const EditIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M12 20h9" />
+    <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+  </svg>
+);
+
 export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -27,15 +34,33 @@ export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
           <span className="card-udise">
             UDISE: <strong>{buildUdise(school.blockCd, school.udiseschCode)}</strong>
           </span>
+          <div className="card-header-actions">
+            {onEdit && (
+              <button
+                className="card-profile-edit-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(school);
+                }}
+                onKeyDown={(e) => e.stopPropagation()}
+                type="button"
+                aria-label={`Edit ${school.schoolName || "school"}`}
+              >
+                <EditIcon />
+              </button>
+            )}
+            <button
+              className={`card-expand-toggle${expanded ? " expanded" : ""}`}
+              type="button"
+              aria-label={expanded ? "Collapse" : "Expand"}
+              onClick={(e) => { e.stopPropagation(); setExpanded((v) => !v); }}
+            >
+              <ChevronDown />
+            </button>
+          </div>
+        </div>
+        <div className="card-management-row">
           <span className="badge badge--private">{displayValue(school.schMgmtDescSt || school.schMgmtDesc, "—")}</span>
-          <button
-            className={`card-expand-toggle${expanded ? " expanded" : ""}`}
-            type="button"
-            aria-label={expanded ? "Collapse" : "Expand"}
-            onClick={(e) => { e.stopPropagation(); setExpanded((v) => !v); }}
-          >
-            <ChevronDown />
-          </button>
         </div>
         <div className="card-title">
           {displayValue(school.schoolName, "—")}
@@ -58,22 +83,17 @@ export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
         </div>
         <div className="card-geo">
           {school.schCatDesc && <span className="card-category">{school.schCatDesc}</span>}
-          {school.blockName && <span>Edu. Block: {school.blockName}</span>}
+          {school.blockName && <span>Block: {school.blockName}</span>}
           {school.villageName && <span>Village: {school.villageName}</span>}
         </div>
       </div>
 
       <div className={`card-collapsible${expanded ? " card-collapsible--open" : ""}`}>
         <div className="card-body">
-          {/* Location */}
-          <div className="card-body-primary">
+          <div className="card-profile-lines">
             <div className="field-row">
               <span className="field-label">Village</span>
               <span className="field-value">{displayValue(school.villageName)}</span>
-            </div>
-            <div className="field-row">
-              <span className="field-label">Address</span>
-              <span className="field-value">{displayValue(school.address)}</span>
             </div>
             <div className="field-row">
               <span className="field-label">PIN Code</span>
@@ -83,10 +103,10 @@ export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
               <span className="field-label">Rural / Urban</span>
               <span className="field-value">{displayValue(school.schLocDesc)}</span>
             </div>
-          </div>
-
-          {/* School Classification */}
-          <div className="card-body-secondary-always">
+            <div className="field-row">
+              <span className="field-label">Management</span>
+              <span className="field-value">{displayValue(school.schMgmtDesc || school.schMgmtDescSt)}</span>
+            </div>
             <div className="field-row">
               <span className="field-label">School Type</span>
               <span className="field-value">{displayValue(school.schTypeDesc)}</span>
@@ -95,10 +115,7 @@ export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
               <span className="field-label">Class Range</span>
               <span className="field-value">{formatClassRange(school.classFrm, school.classTo)}</span>
             </div>
-            <div className="field-row">
-              <span className="field-label">Management</span>
-              <span className="field-value">{displayValue(school.schMgmtDescSt || school.schMgmtDesc)}</span>
-            </div>
+
             {school.schLocRuralUrban === "2" && (
               <>
                 <div className="field-row">
@@ -111,20 +128,13 @@ export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
                 </div>
               </>
             )}
+
+            <div className="field-row">
+              <span className="field-label">Address</span>
+              <span className="field-value">{displayValue(school.address)}</span>
+            </div>
           </div>
         </div>
-
-        {onEdit && (
-          <div className="card-footer">
-            <button
-              className="btn btn--outline btn--sm"
-              onClick={() => onEdit(school)}
-              type="button"
-            >
-              Edit
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
