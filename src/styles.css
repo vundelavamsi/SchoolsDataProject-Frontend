@@ -861,10 +861,10 @@ button, input, select, textarea {
    ---------------------------------------------------------- */
 .school-card {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border: 2px solid #9B59B6;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   transition: box-shadow var(--transition-fast);
   animation: fadeInUp 0.35s ease both;
 }
@@ -876,8 +876,8 @@ button, input, select, textarea {
 /* Card Header */
 .card-header {
   padding: var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-bg);
+  border-bottom: 1px solid #C9C6E6;
+  background: #F3F2FA;
 }
 
 .card-header-top {
@@ -896,26 +896,26 @@ button, input, select, textarea {
 }
 
 .card-management-row {
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
 .card-udise {
   font-size: 12px;
-  color: var(--color-text-muted);
-  font-weight: 500;
+  color: #6A7796;
+  font-weight: 600;
   letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
 }
 
 .card-udise strong {
-  color: var(--color-text-secondary);
+  color: #1F2A44;
   font-weight: 700;
 }
 
 .card-title {
   font-size: 15px;
   font-weight: 700;
-  color: var(--color-primary);
+  color: #1F2A44;
   line-height: 1.35;
   margin-bottom: var(--space-1);
   display: flex;
@@ -952,7 +952,7 @@ button, input, select, textarea {
   flex-wrap: wrap;
   gap: var(--space-1) var(--space-3);
   font-size: 12px;
-  color: var(--color-text-muted);
+  color: #7F8C8D;
 }
 
 .card-geo span {
@@ -960,7 +960,7 @@ button, input, select, textarea {
 }
 
 .card-category {
-  color: #7C3AED;
+  color: #6C5CE7;
   font-weight: 600;
 }
 
@@ -984,9 +984,9 @@ button, input, select, textarea {
   width: 28px;
   height: 28px;
   border: none;
-  background: var(--color-border);
+  background: #CAD5EA;
   border-radius: var(--radius-full);
-  color: var(--color-text-muted);
+  color: #5A6C94;
   cursor: pointer;
   transition: transform var(--transition-fast), background var(--transition-fast);
   -webkit-tap-highlight-color: transparent;
@@ -1027,12 +1027,13 @@ button, input, select, textarea {
 /* Card Body */
 .card-body {
   padding: var(--space-4);
+  background: #F7F6FD;
 }
 
-.card-profile-lines {
+.card-profile-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3) var(--space-4);
+  gap: var(--space-3);
   align-items: start;
 }
 
@@ -1042,9 +1043,9 @@ button, input, select, textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-accent);
+  border: 1px solid #C3CCE0;
+  background: #EEF2FA;
+  color: #2A78C8;
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
@@ -1052,8 +1053,8 @@ button, input, select, textarea {
 }
 
 .card-profile-edit-btn:hover {
-  background: var(--color-accent-light);
-  border-color: var(--color-accent);
+  background: #E4ECFA;
+  border-color: #8EA7D2;
 }
 
 .card-profile-edit-btn:focus-visible {
@@ -1068,6 +1069,98 @@ button, input, select, textarea {
 .card-profile-edit-btn svg {
   width: 14px;
   height: 14px;
+}
+
+.detail-box {
+  --detail-start: #64748B;
+  --detail-end: #94A3B8;
+  --detail-border: #CBD5E1;
+  background: #FFFFFF;
+  border: 1.5px solid var(--detail-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.detail-box--full {
+  grid-column: 1 / -1;
+}
+
+.detail-box-header {
+  background: linear-gradient(90deg, var(--detail-start), var(--detail-end));
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 8px 12px;
+}
+
+.detail-box-value {
+  color: #1F2A44;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  padding: 12px;
+  word-break: break-word;
+}
+
+.detail-box-value--multiline {
+  white-space: pre-line;
+}
+
+.detail-box--village {
+  --detail-start: #4CAF50;
+  --detail-end: #66BB6A;
+  --detail-border: #A5D6A7;
+}
+
+.detail-box--pincode {
+  --detail-start: #1E88E5;
+  --detail-end: #42A5F5;
+  --detail-border: #90CAF9;
+}
+
+.detail-box--rural-urban {
+  --detail-start: #FB8C00;
+  --detail-end: #FFA726;
+  --detail-border: #FFCC80;
+}
+
+.detail-box--management {
+  --detail-start: #F9A825;
+  --detail-end: #FBC02D;
+  --detail-border: #FFE082;
+}
+
+.detail-box--school-type {
+  --detail-start: #8E24AA;
+  --detail-end: #AB47BC;
+  --detail-border: #CE93D8;
+}
+
+.detail-box--class-range {
+  --detail-start: #F4511E;
+  --detail-end: #FF7043;
+  --detail-border: #FFAB91;
+}
+
+.detail-box--urban-local-body {
+  --detail-start: #2E7D32;
+  --detail-end: #66BB6A;
+  --detail-border: #A5D6A7;
+}
+
+.detail-box--ward {
+  --detail-start: #1565C0;
+  --detail-end: #42A5F5;
+  --detail-border: #90CAF9;
+}
+
+.detail-box--address {
+  --detail-start: #D81B60;
+  --detail-end: #EC407A;
+  --detail-border: #F48FB1;
 }
 
 .card-body-primary {
@@ -1164,9 +1257,14 @@ button, input, select, textarea {
 }
 
 .badge--private {
-  background: var(--color-primary);
-  color: #FFFFFF;
-  border: 1px solid var(--color-primary);
+  background: #F4B400;
+  color: #000000;
+  border: 1px solid #F4B400;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 4px 12px;
 }
 
 .badge--operational {

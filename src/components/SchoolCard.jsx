@@ -24,6 +24,17 @@ const EditIcon = () => (
   </svg>
 );
 
+function DetailBox({ type, label, value, fullWidth = false }) {
+  return (
+    <div className={`detail-box detail-box--${type}${fullWidth ? " detail-box--full" : ""}`}>
+      <div className="detail-box-header">{label}</div>
+      <div className={`detail-box-value${type === "address" ? " detail-box-value--multiline" : ""}`}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
 export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -90,49 +101,22 @@ export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
 
       <div className={`card-collapsible${expanded ? " card-collapsible--open" : ""}`}>
         <div className="card-body">
-          <div className="card-profile-lines">
-            <div className="field-row">
-              <span className="field-label">Village</span>
-              <span className="field-value">{displayValue(school.villageName)}</span>
-            </div>
-            <div className="field-row">
-              <span className="field-label">PIN Code</span>
-              <span className="field-value">{displayValue(school.pincode)}</span>
-            </div>
-            <div className="field-row">
-              <span className="field-label">Rural / Urban</span>
-              <span className="field-value">{displayValue(school.schLocDesc)}</span>
-            </div>
-            <div className="field-row">
-              <span className="field-label">Management</span>
-              <span className="field-value">{displayValue(school.schMgmtDesc || school.schMgmtDescSt)}</span>
-            </div>
-            <div className="field-row">
-              <span className="field-label">School Type</span>
-              <span className="field-value">{displayValue(school.schTypeDesc)}</span>
-            </div>
-            <div className="field-row">
-              <span className="field-label">Class Range</span>
-              <span className="field-value">{formatClassRange(school.classFrm, school.classTo)}</span>
-            </div>
+          <div className="card-profile-grid">
+            <DetailBox type="village" label="Village" value={displayValue(school.villageName)} />
+            <DetailBox type="pincode" label="PIN Code" value={displayValue(school.pincode)} />
+            <DetailBox type="rural-urban" label="Rural / Urban" value={displayValue(school.schLocDesc)} />
+            <DetailBox type="management" label="Management" value={displayValue(school.schMgmtDesc || school.schMgmtDescSt)} />
+            <DetailBox type="school-type" label="School Type" value={displayValue(school.schTypeDesc)} />
+            <DetailBox type="class-range" label="Class Range" value={formatClassRange(school.classFrm, school.classTo)} />
 
             {school.schLocRuralUrban === "2" && (
               <>
-                <div className="field-row">
-                  <span className="field-label">Urban Local Body</span>
-                  <span className="field-value">{displayValue(school.lgdurbanlocalbodyName)}</span>
-                </div>
-                <div className="field-row">
-                  <span className="field-label">Ward</span>
-                  <span className="field-value">{displayValue(school.lgdwardName)}</span>
-                </div>
+                <DetailBox type="urban-local-body" label="Urban Local Body" value={displayValue(school.lgdurbanlocalbodyName)} />
+                <DetailBox type="ward" label="Ward" value={displayValue(school.lgdwardName)} />
               </>
             )}
 
-            <div className="field-row">
-              <span className="field-label">Address</span>
-              <span className="field-value">{displayValue(school.address)}</span>
-            </div>
+            <DetailBox type="address" label="Address" value={displayValue(school.address)} fullWidth />
           </div>
         </div>
       </div>
