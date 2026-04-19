@@ -433,7 +433,7 @@ button, input, select, textarea {
   height: calc(var(--bottom-bar-h) + var(--safe-bottom));
   padding-bottom: var(--safe-bottom);
   background: linear-gradient(180deg, #FFFFFF 0%, #F7F6FD 100%);
-  border-top: 2px solid var(--color-theme-border);
+  border-top: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -797,7 +797,6 @@ button, input, select, textarea {
   background: rgba(108, 92, 231, 0.08);
   border-color: var(--color-theme-accent);
 }
-
 .btn--ghost {
   background: transparent;
   color: var(--color-text-secondary);
@@ -1053,6 +1052,16 @@ button, input, select, textarea {
 
 .card-geo span {
   white-space: nowrap;
+}
+
+.card-geo-item--block {
+  color: #1E88E5;
+  font-weight: 600;
+}
+
+.card-geo-item--village {
+  color: #2E7D32;
+  font-weight: 600;
 }
 
 .card-category {
@@ -1726,6 +1735,32 @@ button, input, select, textarea {
 
 .form-hint a:hover {
   color: var(--color-accent-hover);
+}
+
+.form-hint-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: var(--space-1);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid #90CAF9;
+  background: linear-gradient(135deg, #1E88E5, #42A5F5);
+  color: #FFFFFF !important;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: var(--shadow-theme);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+}
+
+.form-hint-badge:hover {
+  color: #FFFFFF !important;
+  filter: brightness(1.05);
+  box-shadow: var(--shadow-theme-hover);
+  transform: translateY(-1px);
 }
 
 .form-actions {
