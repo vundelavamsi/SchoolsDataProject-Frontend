@@ -797,6 +797,7 @@ button, input, select, textarea {
   background: rgba(108, 92, 231, 0.08);
   border-color: var(--color-theme-accent);
 }
+
 .btn--ghost {
   background: transparent;
   color: var(--color-text-secondary);
