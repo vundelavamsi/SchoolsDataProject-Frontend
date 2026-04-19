@@ -135,6 +135,7 @@ export default function App() {
           searchValue={filters.search}
           onSearchChange={(value) => setFilter("search", value)}
           onSearchApply={handleMobileSearchApply}
+          hasPhone={Boolean(phone)}
         />
 
         <div className="app-main">
