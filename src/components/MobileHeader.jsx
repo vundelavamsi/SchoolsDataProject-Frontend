@@ -8,7 +8,7 @@ export function MobileHeader({ onNavigateProfile, searchValue, onSearchChange, o
         </div>
         <nav className="header-nav">
           <button className="btn btn--outline btn--sm" onClick={onNavigateProfile} type="button">
-            Login
+            Profile
           </button>
         </nav>
       </div>

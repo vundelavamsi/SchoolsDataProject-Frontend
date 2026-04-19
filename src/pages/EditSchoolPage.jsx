@@ -10,6 +10,9 @@ function toGoogleMapsLink(lat, lng) {
 
 export function EditSchoolPage({ school, onBack, phone, canEdit }) {
   const [villageName, setVillageName] = useState(school.villageName ?? "");
+  const [pincode, setPincode] = useState(school.pincode ?? "");
+  const [classFrom, setClassFrom] = useState(school.classFrm ?? "");
+  const [classTo, setClassTo] = useState(school.classTo ?? "");
   const [gmapLocationLink, setGmapLocationLink] = useState(school.gmapLocationLink ?? "");
   const [submittedBy, setSubmittedBy] = useState("");
   const [locationTab, setLocationTab] = useState("manual");
@@ -76,9 +79,12 @@ export function EditSchoolPage({ school, onBack, phone, canEdit }) {
     }
 
     const villageChanged = villageName.trim() !== (school.villageName ?? "").trim();
+    const pincodeChanged = pincode.trim() !== String(school.pincode ?? "").trim();
+    const classFromChanged = classFrom.trim() !== String(school.classFrm ?? "").trim();
+    const classToChanged = classTo.trim() !== String(school.classTo ?? "").trim();
     const locationChanged = gmapLocationLink.trim() !== (school.gmapLocationLink ?? "").trim();
 
-    if (!villageChanged && !locationChanged) {
+    if (!villageChanged && !pincodeChanged && !classFromChanged && !classToChanged && !locationChanged) {
       setMessage({ type: "error", text: "No changes made. Update at least one field." });
       return;
     }
@@ -90,6 +96,15 @@ export function EditSchoolPage({ school, onBack, phone, canEdit }) {
       const edits = [];
       if (villageChanged) {
         edits.push({ fieldName: "villageName", newValue: villageName.trim() });
+      }
+      if (pincodeChanged) {
+        edits.push({ fieldName: "pincode", newValue: pincode.trim() });
+      }
+      if (classFromChanged) {
+        edits.push({ fieldName: "classFrm", newValue: classFrom.trim() });
+      }
+      if (classToChanged) {
+        edits.push({ fieldName: "classTo", newValue: classTo.trim() });
       }
       if (locationChanged) {
         edits.push({ fieldName: "gmapLocationLink", newValue: gmapLocationLink.trim() });
@@ -163,6 +178,59 @@ export function EditSchoolPage({ school, onBack, phone, canEdit }) {
                 onChange={(e) => setVillageName(e.target.value)}
                 disabled={submitting}
               />
+            </div>
+
+            <div className="form-field">
+              <label className="form-label" htmlFor="pincode">Pincode</label>
+              <input
+                id="pincode"
+                className="form-input"
+                type="text"
+                inputMode="numeric"
+                value={pincode}
+                onChange={(e) => setPincode(e.target.value)}
+                placeholder="Enter pincode"
+                disabled={submitting}
+              />
+              <p className="form-hint">
+                Check current PIN code:{" "}
+                <a
+                  href="https://dac.indiapost.gov.in/mypincode/home"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  India Post My Pincode
+                </a>
+              </p>
+            </div>
+
+            <div className="form-row">
+              <div className="form-field">
+                <label className="form-label" htmlFor="classFrom">Class From</label>
+                <input
+                  id="classFrom"
+                  className="form-input"
+                  type="text"
+                  inputMode="numeric"
+                  value={classFrom}
+                  onChange={(e) => setClassFrom(e.target.value)}
+                  placeholder="e.g. 1"
+                  disabled={submitting}
+                />
+              </div>
+              <div className="form-field">
+                <label className="form-label" htmlFor="classTo">Class To</label>
+                <input
+                  id="classTo"
+                  className="form-input"
+                  type="text"
+                  inputMode="numeric"
+                  value={classTo}
+                  onChange={(e) => setClassTo(e.target.value)}
+                  placeholder="e.g. 12"
+                  disabled={submitting}
+                />
+              </div>
             </div>
 
             <div className="form-field">

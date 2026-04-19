@@ -22,7 +22,7 @@ function EditCardView({ rows, inFlight, rowErrors, onAction, canReview }) {
   return (
     <div className="edit-cards">
       {rows.map((row) => (
-        <div key={row.id} className="edit-card">
+        <div key={row.id} className={`edit-card edit-card--${row.status}`}>
           <div className="edit-card-header">
             <span className="edit-card-school">{displayValue(row.schoolName)}</span>
             <StatusBadge status={row.status} />
@@ -93,7 +93,7 @@ function EditTableView({ rows, inFlight, rowErrors, onAction, canReview }) {
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.id}>
+            <tr key={row.id} className={`edit-row--${row.status}`}>
               <td>{displayValue(row.schoolName)}</td>
               <td className="td-muted">{buildUdise(row.blockCd, row.udiseschCode)}</td>
               <td className="td-muted">{FIELD_LABELS[row.fieldName] || row.fieldName}</td>
