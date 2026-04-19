@@ -4,20 +4,12 @@ import { buildAccessHeaders } from "../lib/access";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001";
 
-function toGoogleMapsLink(lat, lng) {
-  return `https://maps.google.com/?q=${encodeURIComponent(`${lat},${lng}`)}`;
-}
-
 export function EditSchoolPage({ school, onBack, phone, canEdit }) {
   const [villageName, setVillageName] = useState(school.villageName ?? "");
   const [pincode, setPincode] = useState(school.pincode ?? "");
   const [classFrom, setClassFrom] = useState(school.classFrm ?? "");
   const [classTo, setClassTo] = useState(school.classTo ?? "");
-  const [gmapLocationLink, setGmapLocationLink] = useState(school.gmapLocationLink ?? "");
   const [submittedBy, setSubmittedBy] = useState("");
-  const [locationTab, setLocationTab] = useState("manual");
-  const [geoLoading, setGeoLoading] = useState(false);
-  const [geoError, setGeoError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(null);
   const [hasPending, setHasPending] = useState(false);
@@ -37,37 +29,6 @@ export function EditSchoolPage({ school, onBack, phone, canEdit }) {
       .catch(() => {});
   }, [school.sourceKey, phone, canEdit]);
 
-  const handleDetectLocation = () => {
-    if (!navigator.geolocation) {
-      setGeoError("Geolocation is not supported in this browser.");
-      return;
-    }
-
-    setGeoLoading(true);
-    setGeoError("");
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        const generatedLink = toGoogleMapsLink(latitude, longitude);
-        setGmapLocationLink(generatedLink);
-        setGeoLoading(false);
-      },
-      (error) => {
-        if (error.code === error.PERMISSION_DENIED) {
-          setGeoError("Location permission denied. Please allow location access and try again.");
-        } else if (error.code === error.POSITION_UNAVAILABLE) {
-          setGeoError("Unable to detect current location.");
-        } else if (error.code === error.TIMEOUT) {
-          setGeoError("Location request timed out. Please try again.");
-        } else {
-          setGeoError("Unable to detect current location.");
-        }
-        setGeoLoading(false);
-      },
-      { enableHighAccuracy: true, timeout: 15000 }
-    );
-  };
-
   const handleSave = async () => {
     if (!canEdit) {
       setMessage({ type: "error", text: "This phone number does not have edit access." });
@@ -82,9 +43,8 @@ export function EditSchoolPage({ school, onBack, phone, canEdit }) {
     const pincodeChanged = pincode.trim() !== String(school.pincode ?? "").trim();
     const classFromChanged = classFrom.trim() !== String(school.classFrm ?? "").trim();
     const classToChanged = classTo.trim() !== String(school.classTo ?? "").trim();
-    const locationChanged = gmapLocationLink.trim() !== (school.gmapLocationLink ?? "").trim();
 
-    if (!villageChanged && !pincodeChanged && !classFromChanged && !classToChanged && !locationChanged) {
+    if (!villageChanged && !pincodeChanged && !classFromChanged && !classToChanged) {
       setMessage({ type: "error", text: "No changes made. Update at least one field." });
       return;
     }
@@ -105,9 +65,6 @@ export function EditSchoolPage({ school, onBack, phone, canEdit }) {
       }
       if (classToChanged) {
         edits.push({ fieldName: "classTo", newValue: classTo.trim() });
-      }
-      if (locationChanged) {
-        edits.push({ fieldName: "gmapLocationLink", newValue: gmapLocationLink.trim() });
       }
 
       for (const edit of edits) {
@@ -193,13 +150,14 @@ export function EditSchoolPage({ school, onBack, phone, canEdit }) {
                 disabled={submitting}
               />
               <p className="form-hint">
-                Check current PIN code:{" "}
+                Know your PINCODE -&gt;{" "}
                 <a
+                  className="form-hint-badge"
                   href="https://dac.indiapost.gov.in/mypincode/home"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  India Post My Pincode
+                  CLICK HERE
                 </a>
               </p>
             </div>
@@ -231,57 +189,6 @@ export function EditSchoolPage({ school, onBack, phone, canEdit }) {
                   disabled={submitting}
                 />
               </div>
-            </div>
-
-            <div className="form-field">
-              <label className="form-label">School Location</label>
-              <div className="tab-bar">
-                <button
-                  className={`tab-btn${locationTab === "manual" ? " tab-btn--active" : ""}`}
-                  type="button"
-                  onClick={() => setLocationTab("manual")}
-                >
-                  Manual Link
-                </button>
-                <button
-                  className={`tab-btn${locationTab === "auto" ? " tab-btn--active" : ""}`}
-                  type="button"
-                  onClick={() => setLocationTab("auto")}
-                >
-                  Auto Detect
-                </button>
-              </div>
-              {locationTab === "manual" ? (
-                <input
-                  id="gmapLocationLink"
-                  className="form-input"
-                  type="url"
-                  inputMode="url"
-                  value={gmapLocationLink}
-                  onChange={(e) => setGmapLocationLink(e.target.value)}
-                  placeholder="https://maps.google.com/..."
-                  disabled={submitting}
-                />
-              ) : (
-                <div>
-                  <button
-                    className="btn btn--outline btn--sm"
-                    type="button"
-                    onClick={handleDetectLocation}
-                    disabled={geoLoading || submitting}
-                  >
-                    {geoLoading ? "Detecting..." : "Detect Current Location"}
-                  </button>
-                  {geoError && <div className="inline-error" style={{ marginTop: 8 }}>{geoError}</div>}
-                  {gmapLocationLink && (
-                    <div style={{ marginTop: 8 }}>
-                      <a href={gmapLocationLink} target="_blank" rel="noopener noreferrer">
-                        Preview detected Google Maps link
-                      </a>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
 
             <div className="form-field">

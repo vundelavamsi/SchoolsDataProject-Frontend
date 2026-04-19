@@ -94,8 +94,8 @@ export const SchoolCard = memo(function SchoolCard({ school, onEdit }) {
         </div>
         <div className="card-geo">
           {school.schCatDesc && <span className="card-category">{school.schCatDesc}</span>}
-          {school.blockName && <span>Block: {school.blockName}</span>}
-          {school.villageName && <span>Village: {school.villageName}</span>}
+          {school.blockName && <span className="card-geo-item card-geo-item--block">Block: {school.blockName}</span>}
+          {school.villageName && <span className="card-geo-item card-geo-item--village">Village: {school.villageName}</span>}
         </div>
       </div>
 
