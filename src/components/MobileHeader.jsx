@@ -1,4 +1,4 @@
-export function MobileHeader({ onNavigateProfile, searchValue, onSearchChange, onSearchApply, hasPhone }) {
+export function MobileHeader({ onAccountAction, searchValue, onSearchChange, onSearchApply, isAuthenticated }) {
   return (
     <header className="app-header">
       <div className="header-top-row">
@@ -7,8 +7,8 @@ export function MobileHeader({ onNavigateProfile, searchValue, onSearchChange, o
           <p className="app-subtitle">Search and filter schools across India</p>
         </div>
         <nav className="header-nav">
-          <button className="btn btn--outline btn--sm" onClick={onNavigateProfile} type="button">
-            {hasPhone ? "Profile" : "Login"}
+          <button className="btn btn--outline btn--sm" onClick={onAccountAction} type="button">
+            {isAuthenticated ? "Profile" : "Login"}
           </button>
         </nav>
       </div>

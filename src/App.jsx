@@ -39,6 +39,12 @@ export default function App() {
     }
   }, [currentView, access.canReview, access.canEdit]);
 
+  useEffect(() => {
+    if (currentView === "profile" && !access.authenticated) {
+      setCurrentView("search");
+    }
+  }, [currentView, access.authenticated]);
+
   const activeFilterCount = useMemo(
     () => Object.values(filters).filter((v) => v !== "").length,
     [filters]
@@ -81,6 +87,20 @@ export default function App() {
     setPhoneAndResolve("");
   }, [setPhoneAndResolve]);
 
+  const handleHeaderAccountAction = useCallback(() => {
+    if (access.authenticated) {
+      setCurrentView("profile");
+      return;
+    }
+    setAccessModalOpen(true);
+  }, [access.authenticated]);
+
+  const handleLogout = useCallback(() => {
+    handleClearPhone();
+    setAccessModalOpen(false);
+    setCurrentView("search");
+  }, [handleClearPhone]);
+
   if (currentView === "edit" && selectedSchool) {
     return (
       <EditSchoolPage
@@ -109,19 +129,9 @@ export default function App() {
           access={access}
           accessLoading={accessLoading}
           accessError={accessError}
-          onOpenAccessModal={() => setAccessModalOpen(true)}
           onNavigateReview={() => setCurrentView("review")}
+          onLogout={handleLogout}
           onBack={() => setCurrentView("search")}
-        />
-        <PhoneAccessModal
-          isOpen={accessModalOpen}
-          onClose={() => setAccessModalOpen(false)}
-          phone={phone}
-          access={access}
-          accessLoading={accessLoading}
-          accessError={accessError}
-          onApplyPhone={handleApplyPhone}
-          onClearPhone={handleClearPhone}
         />
       </>
     );
@@ -131,11 +141,11 @@ export default function App() {
       <>
       <div className="app-layout">
         <MobileHeader
-          onNavigateProfile={() => setCurrentView("profile")}
+          onAccountAction={handleHeaderAccountAction}
           searchValue={filters.search}
           onSearchChange={(value) => setFilter("search", value)}
           onSearchApply={handleMobileSearchApply}
-          hasPhone={Boolean(phone)}
+          isAuthenticated={access.authenticated}
         />
 
         <div className="app-main">
@@ -208,6 +218,10 @@ export default function App() {
         accessError={accessError}
         onApplyPhone={handleApplyPhone}
         onClearPhone={handleClearPhone}
+        onAuthenticated={() => {
+          setAccessModalOpen(false);
+          setCurrentView("search");
+        }}
       />
     </>
   );

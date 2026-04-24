@@ -57,6 +57,11 @@ export function useAccess() {
   const setPhoneAndResolve = useCallback((inputValue) => {
     const normalized = normalizePhone(inputValue);
     setPhone(normalized);
+    if (!normalized) {
+      setAccess(GUEST_ACCESS);
+      setError("");
+      setLoading(false);
+    }
     if (typeof window !== "undefined") {
       if (normalized) {
         window.localStorage.setItem(ACCESS_PHONE_STORAGE_KEY, normalized);

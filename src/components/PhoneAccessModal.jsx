@@ -17,17 +17,22 @@ export function PhoneAccessModal({
   accessError,
   onApplyPhone,
   onClearPhone,
+  onAuthenticated,
 }) {
   const [phoneInput, setPhoneInput] = useState(phone);
   const [pendingPhone, setPendingPhone] = useState("");
   const [feedback, setFeedback] = useState(null);
+  const [awaitingResult, setAwaitingResult] = useState(false);
+  const [requestStarted, setRequestStarted] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
     setPhoneInput(phone);
     setPendingPhone("");
     setFeedback(null);
-  }, [isOpen, phone]);
+    setAwaitingResult(false);
+    setRequestStarted(false);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -39,13 +44,21 @@ export function PhoneAccessModal({
   }, [isOpen, onClose]);
 
   useEffect(() => {
-    if (!pendingPhone || accessLoading) return;
-    if (normalizePhone(phone) !== pendingPhone) return;
+    if (!awaitingResult) return;
+    if (accessLoading) setRequestStarted(true);
+  }, [awaitingResult, accessLoading]);
+
+  useEffect(() => {
+    if (!pendingPhone || !awaitingResult || !requestStarted || accessLoading) return;
+
+    setAwaitingResult(false);
+    setRequestStarted(false);
 
     if (access.authenticated) {
       setPendingPhone("");
       setFeedback(null);
       onClose();
+      onAuthenticated?.();
       return;
     }
 
@@ -53,16 +66,27 @@ export function PhoneAccessModal({
     if (accessError) {
       setFeedback({
         kind: "error",
-        text: "Access check is temporarily unavailable. Please continue browsing schools and try again.",
+        text: "Access verification is temporarily unavailable. Please continue browsing schools and try again shortly.",
       });
       return;
     }
 
     setFeedback({
       kind: "warning",
-      text: "Phone not configured. Browsing only.",
+      text: "This phone number does not have access yet. Contact your administrator or continue browsing schools.",
     });
-  }, [pendingPhone, accessLoading, phone, access.authenticated, accessError, onClose]);
+    onClearPhone();
+  }, [
+    pendingPhone,
+    awaitingResult,
+    requestStarted,
+    accessLoading,
+    access.authenticated,
+    accessError,
+    onClose,
+    onAuthenticated,
+    onClearPhone,
+  ]);
 
   if (!isOpen) return null;
 
@@ -78,6 +102,8 @@ export function PhoneAccessModal({
 
     setFeedback(null);
     setPendingPhone(normalized);
+    setAwaitingResult(true);
+    setRequestStarted(false);
     onApplyPhone(normalized);
   };
 
@@ -85,6 +111,8 @@ export function PhoneAccessModal({
     setPhoneInput("");
     setPendingPhone("");
     setFeedback(null);
+    setAwaitingResult(false);
+    setRequestStarted(false);
     onClearPhone();
     onClose();
   };
@@ -101,7 +129,7 @@ export function PhoneAccessModal({
         <div className="phone-modal-header">
           <div>
             <h2 id="phone-access-title" className="phone-modal-title">Phone access</h2>
-            <p className="phone-modal-subtitle">Browsing works without a phone number.</p>
+            <p className="phone-modal-subtitle">Browsing remains available without phone verification.</p>
           </div>
           <button className="phone-modal-close" onClick={onClose} type="button" aria-label="Close">
             ×
@@ -120,6 +148,9 @@ export function PhoneAccessModal({
             placeholder="10-digit mobile number"
             disabled={isApplying}
           />
+          <p className="phone-modal-helper">
+            Use a registered 10-digit mobile number. This checks permissions only.
+          </p>
         </div>
 
         <div className="phone-modal-actions">
@@ -139,12 +170,15 @@ export function PhoneAccessModal({
         )}
 
         <div className={`${getInlineClass(resolvedAccess.kind)} profile-status`}>
+          <div className="sr-only" aria-live="polite">
+            {resolvedAccess.headline} {resolvedAccess.detail}
+          </div>
           <div className="profile-status-headline">{resolvedAccess.headline}</div>
           <div className="profile-status-detail">{resolvedAccess.detail}</div>
         </div>
 
         {feedback && (
-          <div className={getInlineClass(feedback.kind)}>
+          <div className={getInlineClass(feedback.kind)} role="alert" aria-live="assertive">
             {feedback.text}
           </div>
         )}

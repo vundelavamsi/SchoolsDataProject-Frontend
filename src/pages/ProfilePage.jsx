@@ -12,8 +12,8 @@ export function ProfilePage({
   access,
   accessLoading,
   accessError,
-  onOpenAccessModal,
   onNavigateReview,
+  onLogout,
   onBack,
 }) {
   const accessState = describeAccessState({ phone, access, error: accessError });
@@ -23,7 +23,7 @@ export function ProfilePage({
       <header className="app-header">
         <div className="header-left">
           <h1 className="app-title">Profile</h1>
-          <p className="app-subtitle">Manage phone access and permissions</p>
+          <p className="app-subtitle">Account access and permissions</p>
         </div>
         <nav className="header-nav">
           <button className="btn btn--outline btn--sm" onClick={onBack} type="button">
@@ -37,8 +37,8 @@ export function ProfilePage({
           <div className="page-card profile-card">
             <div className="profile-header-row">
               <div>
-                <h2 className="profile-title">Access details</h2>
-                <p className="profile-subtitle-copy">Phone access is optional for browsing.</p>
+                <h2 className="profile-title">Account profile</h2>
+                <p className="profile-subtitle-copy">You are signed in with phone-based role access.</p>
               </div>
               {accessLoading && <span className="badge badge--other">Checking…</span>}
             </div>
@@ -64,14 +64,14 @@ export function ProfilePage({
             </div>
 
             <div className="profile-actions">
-              <button className="btn btn--primary" onClick={onOpenAccessModal} type="button">
-                Manage phone access
-              </button>
               {(access.canEdit || access.canReview) && (
-                <button className="btn btn--outline" onClick={onNavigateReview} type="button">
+                <button className="btn btn--primary" onClick={onNavigateReview} type="button">
                   {access.canReview ? "Review Edits" : "My Edits"}
                 </button>
               )}
+              <button className="btn btn--danger" onClick={onLogout} type="button">
+                Logout
+              </button>
             </div>
           </div>
         </div>
