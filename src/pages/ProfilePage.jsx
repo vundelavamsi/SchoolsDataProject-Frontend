@@ -16,7 +16,7 @@ export function ProfilePage({
   onLogout,
   onBack,
 }) {
-  const accessState = describeAccessState({ phone, access, error: accessError });
+  const accessState = describeAccessState({ phone, access, error: accessError, loading: accessLoading });
 
   return (
     <div className="app-layout">

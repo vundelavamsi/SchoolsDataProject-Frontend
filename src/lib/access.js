@@ -20,7 +20,7 @@ export function getAccessScopeLabel(access) {
   return "global scope";
 }
 
-export function describeAccessState({ phone, access, error }) {
+export function describeAccessState({ phone, access, error, loading = false }) {
   const normalizedPhone = normalizePhone(phone || access?.phone || "");
 
   if (error) {
@@ -28,6 +28,14 @@ export function describeAccessState({ phone, access, error }) {
       kind: "error",
       headline: "Access check unavailable right now.",
       detail: "Please continue browsing schools and retry from Profile.",
+    };
+  }
+
+  if (loading && normalizedPhone) {
+    return {
+      kind: "info",
+      headline: "Checking phone access…",
+      detail: `Validating ${normalizedPhone} for edit or review permissions.`,
     };
   }
 

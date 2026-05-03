@@ -90,7 +90,12 @@ export function PhoneAccessModal({
 
   if (!isOpen) return null;
 
-  const resolvedAccess = describeAccessState({ phone, access, error: accessError });
+  const resolvedAccess = describeAccessState({
+    phone,
+    access,
+    error: accessError,
+    loading: accessLoading || awaitingResult,
+  });
   const isApplying = !!pendingPhone && accessLoading;
 
   const handleApply = () => {
